@@ -117,7 +117,7 @@ def unpack(packed_image: np.ndarray):
     return image, positive_maps
 
 
-def create_patch(original_path: str, modified_path: str, patch_path: str, noise_path: str, shift_path: str):
+def create_patch(original_path: str, modified_path: str, patch_path: str):
     original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
     resized_image = resized_to_shape(original_image, modified_image.shape)
@@ -140,7 +140,7 @@ def create_patch(original_path: str, modified_path: str, patch_path: str, noise_
     cv2.imwrite(patch_path, patch_image)
 
 
-def create_patched(original_path: str, patch_path: str, noise_path: str, shift_path: str, patched_path: str):
+def create_patched(original_path: str, patch_path: str, patched_path: str):
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
     shifted_image, positive_maps = unpack(patch_image)
     difference_is_positive, hashed_is_positive = positive_maps
@@ -171,7 +171,7 @@ def compare_image(reference_path: str, patched_path: str) -> None:
     pass
 
 
-def reverse_original(modified_path: str, patch_path: str, noise_path: str, shift_path: str, reversed_path: str) -> None:
+def reverse_original(modified_path: str, patch_path: str, reversed_path: str) -> None:
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
     shifted_image, positive_maps = unpack(patch_image)
@@ -192,14 +192,12 @@ def test() -> None:
     original_path = "./buzzerfly/buzzerfly-icon.png"
     modified_path = "./buzzerfly/buzzerfly-icon-modified.png"
     patch_path = "./buzzerfly-icon-patch-v6.png"
-    noise_path = "./buzzerfly-icon-patch-noise.npy"
-    shift_path = "./buzzerfly-icon-patch-shift.npy"
     patched_path = "./buzzerfly-icon-patched-v6.png"
     reversed_path = "./buzzerfly-icon-reversed-v6.png"
-    create_patch(original_path, modified_path, patch_path, noise_path, shift_path)
-    create_patched(original_path, patch_path, noise_path, shift_path, patched_path)
+    create_patch(original_path, modified_path, patch_path)
+    create_patched(original_path, patch_path, patched_path)
     compare_image(modified_path, patched_path)
-    reverse_original(modified_path, patch_path, noise_path, shift_path, reversed_path)
+    reverse_original(modified_path, patch_path, reversed_path)
     compare_image(original_path, reversed_path)
     pass
 
