@@ -1,6 +1,10 @@
 import cv2
 import numpy as np
 import math
+import pathlib
+
+
+Path = pathlib.Path
 
 
 NOISE_VARIANCE = 96
@@ -117,7 +121,7 @@ def unpack(packed_image: np.ndarray):
     return image, positive_maps
 
 
-def create_patch(original_path: str, modified_path: str, patch_path: str):
+def create_patch(original_path: Path, modified_path: Path, patch_path: Path):
     original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
     resized_image = resized_to_shape(original_image, modified_image.shape)
@@ -140,7 +144,7 @@ def create_patch(original_path: str, modified_path: str, patch_path: str):
     cv2.imwrite(patch_path, patch_image)
 
 
-def create_patched(original_path: str, patch_path: str, patched_path: str):
+def create_patched(original_path: Path, patch_path: Path, patched_path: Path):
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
     shifted_image, positive_maps = unpack(patch_image)
     difference_is_positive, hashed_is_positive = positive_maps
@@ -159,7 +163,7 @@ def create_patched(original_path: str, patch_path: str, patched_path: str):
     cv2.imwrite(patched_path, patched_image)
 
 
-def compare_image(reference_path: str, patched_path: str) -> None:
+def compare_image(reference_path: Path, patched_path: Path) -> None:
     reference_image = cv2.imread(reference_path, cv2.IMREAD_UNCHANGED)
     patched_image = cv2.imread(patched_path, cv2.IMREAD_UNCHANGED)
     resized_image = resized_to_shape(reference_image, patched_image.shape)
@@ -171,7 +175,7 @@ def compare_image(reference_path: str, patched_path: str) -> None:
     pass
 
 
-def reverse_original(modified_path: str, patch_path: str, reversed_path: str) -> None:
+def reverse_original(modified_path: Path, patch_path: Path, reversed_path: Path) -> None:
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
     shifted_image, positive_maps = unpack(patch_image)
@@ -188,19 +192,19 @@ def reverse_original(modified_path: str, patch_path: str, reversed_path: str) ->
     cv2.imwrite(reversed_path, reversed_image)
 
 
-def test() -> None:
-    original_path = "./demo/buzzerfly-icon.png"
-    modified_path = "./demo/buzzerfly-icon-modified.png"
-    patch_path = "./demo/buzzerfly-icon-patch-v6.png"
-    patched_path = "./demo/buzzerfly-icon-patched-v6.png"
-    reversed_path = "./demo/buzzerfly-icon-reversed-v6.png"
+def test_patch(original_path: Path, modified_path: Path) -> None:
+    patch_path = original_path.with_stem(original_path.stem + "-patch-v6")
+    patched_path = original_path.with_stem(original_path.stem + "-patched-v6")
+    reversed_path = original_path.with_stem(original_path.stem + "-reversed-v6")
     create_patch(original_path, modified_path, patch_path)
     create_patched(original_path, patch_path, patched_path)
     compare_image(modified_path, patched_path)
     reverse_original(modified_path, patch_path, reversed_path)
     compare_image(original_path, reversed_path)
-    pass
 
+
+def test() -> None:
+    test_patch(Path("./demo/buzzerfly-icon.png"), Path("./demo/buzzerfly-icon-modified.png"))
 
 if __name__ == "__main__":
     test()
