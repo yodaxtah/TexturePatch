@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 
 NOISE_VARIANCE = 96
@@ -69,6 +70,53 @@ def signed(is_positive: np.ndarray, matrix: np.ndarray, positive_offset: int = 0
     return positive + negative
 
 
+def remainder_modulo(value: int, modulo: int) -> int:
+    remainder = value % modulo
+    if remainder == 0:
+        return 0
+    else:
+        return modulo - remainder
+
+
+def remainder_ceil(value: int, ceil: int) -> int:
+    return math.ceil(value / ceil) * ceil
+
+
+def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
+    assert all([image.shape == m.shape for m in positive_maps])
+    packed = image.reshape(-1)
+    packed_shape = np.array(image.shape, dtype=np.uint16).view(dtype=np.uint8)
+    for m in positive_maps:
+        packed_map = np.packbits(m.reshape(-1))
+        packed = np.append(packed, packed_map)
+    row_size = np.prod(image.shape[1:])
+    number_of_zeros = remainder_modulo(packed.size + packed_shape.size, row_size)
+    packed = np.append(packed, np.zeros(number_of_zeros))
+    packed = np.append(packed, packed_shape)
+    packed_image = packed.reshape(-1, *image.shape[1:])
+    return packed_image
+
+
+def unpack(packed_image: np.ndarray):
+    PACKED_SHAPE_SIZE = 6
+    packed = packed_image.reshape(-1)
+    packed_shape = tuple(packed[-PACKED_SHAPE_SIZE:].reshape(-1).view(dtype=np.uint16))
+    image_size = np.prod(packed_shape)
+    image = packed[:image_size].reshape(packed_shape)
+    row_size = np.prod(packed_shape[1:])
+    last_row_size = remainder_ceil(PACKED_SHAPE_SIZE, row_size) # this was unnecessary
+    total_map_size = (packed.size - image_size - last_row_size)
+    number_of_positive_maps = total_map_size * 8 // image_size
+    map_size = total_map_size // number_of_positive_maps
+    assert number_of_positive_maps == 2
+    positive_maps = []
+    for i in range(number_of_positive_maps):
+        offset = image_size + i * map_size
+        unpacked_map = np.unpackbits(packed[offset:offset + map_size]).reshape(packed_shape).astype(bool)
+        positive_maps.append(unpacked_map)
+    return image, positive_maps
+
+
 def create_patch(original_path: str, modified_path: str, patch_path: str, noise_path: str, shift_path: str):
     original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
@@ -87,20 +135,19 @@ def create_patch(original_path: str, modified_path: str, patch_path: str, noise_
     assert shifted.max() < 256
     assert shifted.min() >= 0
 
-    patch_image: np.ndarray = shifted.astype(np.uint8)
+    shifted_image: np.ndarray = shifted.astype(np.uint8)
+    patch_image: np.ndarray = pack(shifted_image, [difference_is_positive, hashed_is_positive])
     cv2.imwrite(patch_path, patch_image)
-    np.save(noise_path, np.packbits(difference_is_positive.reshape(-1)))
-    np.save(shift_path, np.packbits(hashed_is_positive.reshape(-1)))
 
 
 def create_patched(original_path: str, patch_path: str, noise_path: str, shift_path: str, patched_path: str):
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
+    shifted_image, positive_maps = unpack(patch_image)
+    difference_is_positive, hashed_is_positive = positive_maps
     original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
-    resized_image = resized_to_shape(original_image, patch_image.shape)
-    difference_is_positive = np.unpackbits(np.load(noise_path)).reshape(patch_image.shape).astype(bool)
-    hashed_is_positive = np.unpackbits(np.load(shift_path)).reshape(patch_image.shape).astype(bool)
+    resized_image = resized_to_shape(original_image, shifted_image.shape)
 
-    shifted = patch_image.astype(np.int16)
+    shifted = shifted_image.astype(np.int16)
     hashed = sign_unshifted_image(hashed_is_positive, shifted)
 
     resized: np.ndarray = resized_image.astype(np.int16)
@@ -127,10 +174,10 @@ def compare_image(reference_path: str, patched_path: str) -> None:
 def reverse_original(modified_path: str, patch_path: str, noise_path: str, shift_path: str, reversed_path: str) -> None:
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED)
     patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
-    difference_is_positive = np.unpackbits(np.load(noise_path)).reshape(patch_image.shape).astype(bool)
-    hashed_is_positive = np.unpackbits(np.load(shift_path)).reshape(patch_image.shape).astype(bool)
+    shifted_image, positive_maps = unpack(patch_image)
+    difference_is_positive, hashed_is_positive = positive_maps
 
-    shifted = patch_image.astype(np.int16)
+    shifted = shifted_image.astype(np.int16)
     hashed = sign_unshifted_image(hashed_is_positive, shifted)
     
     noise: np.ndarray = np.zeros(hashed.shape) # create_noise_image(resized, 0)
@@ -144,11 +191,11 @@ def reverse_original(modified_path: str, patch_path: str, noise_path: str, shift
 def test() -> None:
     original_path = "./buzzerfly/buzzerfly-icon.png"
     modified_path = "./buzzerfly/buzzerfly-icon-modified.png"
-    patch_path = "./buzzerfly-icon-patch-v5.png"
+    patch_path = "./buzzerfly-icon-patch-v6.png"
     noise_path = "./buzzerfly-icon-patch-noise.npy"
     shift_path = "./buzzerfly-icon-patch-shift.npy"
-    patched_path = "./buzzerfly-icon-patched-v5.png"
-    reversed_path = "./buzzerfly-icon-reversed-v5.png"
+    patched_path = "./buzzerfly-icon-patched-v6.png"
+    reversed_path = "./buzzerfly-icon-reversed-v6.png"
     create_patch(original_path, modified_path, patch_path, noise_path, shift_path)
     create_patched(original_path, patch_path, noise_path, shift_path, patched_path)
     compare_image(modified_path, patched_path)
