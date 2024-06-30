@@ -189,11 +189,11 @@ def reverse_original(modified_path: str, patch_path: str, reversed_path: str) ->
 
 
 def test() -> None:
-    original_path = "./buzzerfly/buzzerfly-icon.png"
-    modified_path = "./buzzerfly/buzzerfly-icon-modified.png"
-    patch_path = "./buzzerfly-icon-patch-v6.png"
-    patched_path = "./buzzerfly-icon-patched-v6.png"
-    reversed_path = "./buzzerfly-icon-reversed-v6.png"
+    original_path = "./demo/buzzerfly-icon.png"
+    modified_path = "./demo/buzzerfly-icon-modified.png"
+    patch_path = "./demo/buzzerfly-icon-patch-v6.png"
+    patched_path = "./demo/buzzerfly-icon-patched-v6.png"
+    reversed_path = "./demo/buzzerfly-icon-reversed-v6.png"
     create_patch(original_path, modified_path, patch_path)
     create_patched(original_path, patch_path, patched_path)
     compare_image(modified_path, patched_path)
