@@ -19,13 +19,14 @@ def resized_to_shape(image: np.ndarray, shape: tuple[int, int]) -> np.ndarray:
 
 
 def extract_seed(image: np.ndarray) -> np.ndarray:
-    height, width, number_of_channels = image.shape
-    minimum = image.min()
-    maximum = image.max()
-    summation = image.sum()
-    sample_sum = image.reshape(-1)[0::17].sum() # https://stackoverflow.com/questions/25876640/subsampling-every-nth-entry-in-a-numpy-array
-    seed = width * height * (maximum - minimum) + summation + sample_sum + number_of_channels
-    return seed
+    height, width, number_of_channels = [int(i) for i in image.shape]
+    minimum = int(image.min())
+    maximum = int(image.max())
+    summation = int(image.sum())
+    sample_sum1 = int(image.reshape(-1)[0::17].sum()) # https://stackoverflow.com/questions/25876640/subsampling-every-nth-entry-in-a-numpy-array
+    sample_sum2 = int(image.reshape(-1)[1::23].sum()) # https://stackoverflow.com/questions/25876640/subsampling-every-nth-entry-in-a-numpy-array
+    seed = width * height * (maximum - minimum) + summation - sample_sum1 * number_of_channels - sample_sum2
+    return seed % (2**32 - 1)
 
 
 def create_noise_image(image: np.ndarray, variance: float = 20) -> np.ndarray:
