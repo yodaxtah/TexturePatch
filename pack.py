@@ -14,8 +14,8 @@ def resized_to_shape(image: np.ndarray, shape: tuple[int, int]) -> np.ndarray:
     # height = shape[0] / image.shape[0]
     # width = shape[1] / image.shape[1]
     # resized_shape = (width, height)
-    shape = (shape[0], shape[1])
-    return cv2.resize(image, shape, interpolation=cv2.INTER_LINEAR)
+    shape_ = (shape[1], shape[0])
+    return cv2.resize(image, shape_, interpolation=cv2.INTER_CUBIC)
 
 
 def extract_seed(image: np.ndarray) -> np.ndarray:
