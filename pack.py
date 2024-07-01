@@ -34,7 +34,8 @@ def create_noise_image(image: np.ndarray, variance: float = 20) -> np.ndarray:
     height, width, _ = image.shape
     np.random.seed(seed=extract_seed(image))
     noise = np.random.rand(*image.shape) * variance
-    noise[:,:,3] = 0
+    if noise.shape[2] > 3:
+        noise[:,:,3] = 0
     return noise.astype(np.uint8)
 
 
