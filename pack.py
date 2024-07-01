@@ -97,7 +97,7 @@ def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
         packed = np.append(packed, packed_map)
     row_size = np.prod(image.shape[1:])
     number_of_zeros = remainder_modulo(packed.size + packed_shape.size, row_size)
-    packed = np.append(packed, np.zeros(number_of_zeros))
+    packed = np.append(packed, np.zeros(number_of_zeros, dtype=np.uint8))
     packed = np.append(packed, packed_shape)
     packed_image = packed.reshape(-1, *image.shape[1:])
     return packed_image
