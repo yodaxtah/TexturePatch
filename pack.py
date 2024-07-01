@@ -106,10 +106,10 @@ def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
 def unpack(packed_image: np.ndarray):
     PACKED_SHAPE_SIZE = 6
     packed = packed_image.reshape(-1)
-    packed_shape = tuple(packed[-PACKED_SHAPE_SIZE:].reshape(-1).view(dtype=np.uint16))
-    image_size = np.prod(packed_shape)
-    image = packed[:image_size].reshape(packed_shape)
-    row_size = np.prod(packed_shape[1:])
+    shape = tuple(packed[-PACKED_SHAPE_SIZE:].reshape(-1).view(dtype=np.uint16))
+    image_size = np.prod(shape)
+    image = packed[:image_size].reshape(shape)
+    row_size = np.prod(shape[1:])
     last_row_size = remainder_ceil(PACKED_SHAPE_SIZE, row_size) # this was unnecessary
     total_map_size = (packed.size - image_size - last_row_size)
     number_of_positive_maps = total_map_size * 8 // image_size
@@ -118,7 +118,7 @@ def unpack(packed_image: np.ndarray):
     positive_maps = []
     for i in range(number_of_positive_maps):
         offset = image_size + i * map_size
-        unpacked_map = np.unpackbits(packed[offset:offset + map_size]).reshape(packed_shape).astype(bool)
+        unpacked_map = np.unpackbits(packed[offset:offset + map_size]).reshape(shape).astype(bool)
         positive_maps.append(unpacked_map)
     return image, positive_maps
 
