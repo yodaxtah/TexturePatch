@@ -230,9 +230,9 @@ def reverse_original(modified_path: Path, patch_path: Path, reversed_path: Path)
 
 
 def test_patch(original_path: Path, modified_path: Path) -> None:
-    patch_path = original_path.with_stem(original_path.stem + "-patch-v6")
-    patched_path = original_path.with_stem(original_path.stem + "-patched-v6")
-    reversed_path = original_path.with_stem(original_path.stem + "-reversed-v6")
+    patch_path = original_path.with_stem(original_path.stem + "-patch-v6").with_suffix(".png") # must be lossless
+    patched_path = original_path.with_stem(original_path.stem + "-patched-v6").with_suffix(modified_path.suffix)
+    reversed_path = original_path.with_stem(original_path.stem + "-reversed-v6").with_suffix(modified_path.suffix)
     difference_path = original_path.with_stem(original_path.stem + "-difference-v6").with_suffix(modified_path.suffix)
     create_patch(original_path, modified_path, patch_path)
     create_patched(original_path, patch_path, patched_path)
@@ -243,6 +243,8 @@ def test_patch(original_path: Path, modified_path: Path) -> None:
 
 def test() -> None:
     test_patch(Path("./demo/buzzerfly-icon.png"), Path("./demo/buzzerfly-icon-modified.png"))
+    test_patch(Path("./demo/crate-brown-wood.jpg"), Path("./demo/crate-brown-wood-modified.png"))
+    test_patch(Path("./demo/duion-art-photos-CF_DSC05592.jpg"), Path("./demo/duion-art-photos-CF_DSC05592-modified.jpg"))
 
 if __name__ == "__main__":
     test()
