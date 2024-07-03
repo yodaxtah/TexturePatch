@@ -1,4 +1,4 @@
-from pack import create_patch, create_patched
+from patch import create_patch, create_patched
 from difference import compare_image, reverse_original
 
 import numpy as np
