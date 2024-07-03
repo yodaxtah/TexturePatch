@@ -96,8 +96,11 @@ def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
         packed_map = np.packbits(m.reshape(-1))
         packed = np.append(packed, packed_map)
     row_size = np.prod(image.shape[1:])
-    number_of_zeros = remainder_modulo(packed.size + packed_shape.size, row_size)
+    assert packed_map.size > row_size
+    packed_number_of_zeros_size = 2
+    number_of_zeros = remainder_modulo(packed.size + packed_number_of_zeros_size + packed_shape.size, row_size)
     packed = np.append(packed, np.zeros(number_of_zeros, dtype=np.uint8))
+    packed = np.append(packed, np.array([number_of_zeros], dtype=np.uint16).view(dtype=np.uint8))
     packed = np.append(packed, packed_shape)
     packed_image = packed.reshape(-1, *image.shape[1:])
     return packed_image
@@ -105,13 +108,15 @@ def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
 
 def unpack(packed_image: np.ndarray):
     PACKED_SHAPE_SIZE = 6
+    ZEROS_SIZE = 2
     packed = packed_image.reshape(-1)
     shape = tuple(packed[-PACKED_SHAPE_SIZE:].reshape(-1).view(dtype=np.uint16))
+    number_of_zeros = int(packed[-PACKED_SHAPE_SIZE-ZEROS_SIZE:-PACKED_SHAPE_SIZE].reshape(-1).view(dtype=np.uint16))
     image_size = np.prod(shape)
     image = packed[:image_size].reshape(shape)
-    row_size = np.prod(shape[1:])
-    last_row_size = remainder_ceil(PACKED_SHAPE_SIZE, row_size) # this was unnecessary
-    total_map_size = (packed.size - image_size - last_row_size)
+    # row_size = np.prod(shape[1:])
+    tail_size = number_of_zeros + ZEROS_SIZE + PACKED_SHAPE_SIZE
+    total_map_size = packed.size - image_size - tail_size
     number_of_positive_maps = total_map_size * 8 // image_size
     map_size = total_map_size // number_of_positive_maps
     assert number_of_positive_maps == 2
