@@ -69,7 +69,7 @@ def create_texture_pack(patch_path: Path, original_path: Path, pack_path: Path, 
         image_pack_path.parent.mkdir(parents=True, exist_ok=True)
         create_patched(image_original_path, image_patch_path, image_pack_path)
         if modified_path:
-            image_modified_path = original_path.joinpath(uncommon_path)
+            image_modified_path = modified_path.joinpath(uncommon_path)
             if (difference := compare_image(image_modified_path, image_pack_path)) == (0, 0):
                 print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
             else:
