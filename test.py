@@ -6,10 +6,10 @@ from pathlib import Path
 
 
 def test_patch(original_path: Path, modified_path: Path) -> None:
-    patch_path = original_path.with_stem(original_path.stem + "-patch-v8").with_suffix(".png") # must be lossless
-    patched_path = original_path.with_stem(original_path.stem + "-patched-v8").with_suffix(modified_path.suffix)
-    reversed_path = original_path.with_stem(original_path.stem + "-reversed-v8").with_suffix(modified_path.suffix)
-    difference_path = original_path.with_stem(original_path.stem + "-difference-v8").with_suffix(modified_path.suffix)
+    patch_path = modified_path.with_stem(original_path.stem + "-patch-v8-1").with_suffix(".png") # must be lossless
+    patched_path = modified_path.with_stem(original_path.stem + "-patched-v8-1").with_suffix(modified_path.suffix)
+    reversed_path = modified_path.with_stem(original_path.stem + "-reversed-v8-1").with_suffix(modified_path.suffix)
+    difference_path = modified_path.with_stem(original_path.stem + "-difference-v8-1").with_suffix(modified_path.suffix)
     create_patch(original_path, modified_path, patch_path)
     create_patched(original_path, patch_path, patched_path)
     if (difference := compare_image(modified_path, patched_path, difference_path)) != (0, 0):
