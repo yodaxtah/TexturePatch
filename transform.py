@@ -16,7 +16,7 @@ def linear_transform(x: np.ndarray, a: int|float|np.ndarray, b: int|float|np.nda
 
 
 def multi_linear_transform(coefficient_index: np.ndarray, x: np.ndarray, coefficients: list[tuple[int, int]]) -> np.ndarray:
-    assert coefficient_index.shape == x.shape
+    assert coefficient_index.shape == x.shape, "x shape doesn't match coefficient shape"
     transform = np.zeros(x.shape)
     for i in range(len(coefficients)):
         a, b = coefficients[i]
@@ -30,19 +30,19 @@ def negative_transform(x: np.ndarray, coefficients: tuple[int, int]) -> np.ndarr
 
 
 def sign_shifted_image(image: np.ndarray) -> np.ndarray:
-    return negative_transform(image, (1, 256))
+    return negative_transform(image, (1, max_luminance(image)+1)).astype(image.dtype)
 
 
 def absolute_image(image: np.ndarray) -> np.ndarray:
-    return negative_transform(image, (-1, -1))
+    return negative_transform(image, (-1, -1)).astype(image.dtype)
 
 
 def sign_unshifted_image(is_positive: np.ndarray, image: np.ndarray) -> np.ndarray:
-    return multi_linear_transform(np.invert(is_positive), image, [(1, 0), (1, -256)])
+    return multi_linear_transform(np.invert(is_positive), image, [(1, 0), (1, -max_luminance(image)-1)]).astype(image.dtype)
 
 
 def signed(is_positive: np.ndarray, matrix: np.ndarray, positive_offset: int = 0, negative_offset: int = 0, positive_factor: int = 1, negative_factor: int = -1) -> np.ndarray:
-    assert is_positive.shape == matrix.shape
+    assert is_positive.shape == matrix.shape, "map shape doesn't match mtrix shape"
     positive = (matrix + positive_offset) * positive_factor * is_positive
     negative = (matrix + negative_offset) * negative_factor * np.invert(is_positive)
     return positive + negative
@@ -58,3 +58,9 @@ def remainder_modulo(value: int, modulo: int) -> int:
 
 def remainder_ceil(value: int, ceil: int) -> int:
     return math.ceil(value / ceil) * ceil
+
+
+def max_luminance(image):
+    dtype = image.dtype if hasattr(image, "dtype") else image
+    itemsize = dtype.itemsize if dtype.kind == "u" else dtype.itemsize // 2 # yes, signed 16 bit -> 255
+    return int(2 ** (8 * itemsize)) - 1

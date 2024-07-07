@@ -12,6 +12,8 @@ RED = "\x1b[1;31m"
 GREEN = "\x1b[1;32m"
 ORANGE = "\x1b[1;33m"
 BLUE = "\x1b[1;34m"
+MAGENTA = "\x1b[1;35m"
+CYAN = "\x1b[1;36m"
 BOLD = "\x1b[1;37m"
 
 
@@ -35,46 +37,66 @@ def check_out_path(target_path: Path, callback_dir: Callable[[str, int], None], 
             callback_file(child_path, level+1)
 
 
-def create_texture_patch_pack(modified_path: Path, original_path: Path, patch_path: Path) -> None:
+def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path) -> None:
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
             text += f" ({len(images)})"
-        print_indented(text, level)
+        print_indented(f"{BOLD}{MAGENTA}{text}{RESET}", level)
     def callback_file(image_modified_path: Path, level: int):
-        if image_modified_path.suffix in SUFFIXES:
+        if image_modified_path.suffix in SUFFIXES: # and image_modified_path.name == "bch-bench-wood.png":
             uncommon_path = image_modified_path.relative_to(modified_path)
             image_patch_path = patch_path.joinpath(uncommon_path)
             image_original_path = original_path.joinpath(uncommon_path)
-            print_indented(image_patch_path.as_posix(), level)
+            text = image_original_path.as_posix()
+            print_indented("… " + text, level, end=(None if modified_path == None else "\r"))
             image_patch_path.parent.mkdir(parents=True, exist_ok=True)
-            create_patch(image_original_path, image_modified_path, image_patch_path)
+            try:
+                if not image_original_path.exists():
+                    raise FileNotFoundError("Original file does not exist")
+                create_patch(image_original_path, image_modified_path, image_patch_path)
+            except FileNotFoundError as e:
+                print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
+                print("warning:", str(e))
+            except Exception as e:
+                print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
+                print("error:", str(e))
+            else:
+                print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
     check_out_path(modified_path, callback_dir, callback_file)
-    # check_out_path(Path("./test/modified"), print_path_name_indented, print_path_name_indented)
 
 
-def create_texture_pack(patch_path: Path, original_path: Path, pack_path: Path, modified_path: Path|None = None) -> None:
+def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None) -> None:
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
             text += f" ({len(images)})"
-        print_indented(text, level)
+        print_indented(f"{BOLD}{CYAN}{text}{RESET}", level)
     def callback_file(image_patch_path: Path, level: int):
         # if image_patch_path.suffix in SUFFIXES:
         uncommon_path = image_patch_path.relative_to(patch_path)
         image_pack_path = pack_path.joinpath(uncommon_path)
         image_original_path = original_path.joinpath(uncommon_path)
         text = image_pack_path.as_posix()
-        print_indented("… " + text, level, end=(None if modified_path == None else "\r"))
+        print_indented("… " + text, level, end="\r")
         image_pack_path.parent.mkdir(parents=True, exist_ok=True)
-        create_patched(image_original_path, image_patch_path, image_pack_path)
-        if modified_path:
-            image_modified_path = modified_path.joinpath(uncommon_path)
-            if (difference := compare_image(image_modified_path, image_pack_path)) == (0, 0):
-                print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
+        try:
+            create_patched(image_original_path, image_patch_path, image_pack_path)
+            if modified_path:
+                image_modified_path = modified_path.joinpath(uncommon_path)
+                if (difference := compare_image(image_modified_path, image_pack_path)) == (0, 0):
+                    print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
+                else:
+                    print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
+                    print(f"({BLUE}{difference[0]}{RESET}, {RED}{difference[1]}{RESET})")
             else:
-                print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
-                print(f"({BLUE}{difference[0]}{RESET}, {RED}{difference[1]}{RESET})", flush=True)
+                print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
+        except AssertionError as e:
+            print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
+            print("assertion error:", str(e))
+        except Exception as e:
+            print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
+            print("error:", str(e))
     check_out_path(patch_path, callback_dir, callback_file)
 
 
