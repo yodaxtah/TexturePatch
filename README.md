@@ -41,7 +41,7 @@ We've made quite a few over simplifications.
 
 ## Protecting the original image from reversing
 
-Given that the formula in the concept is only a difference, one could simply calculate $Reversed = Patch - Modified = Original$ without ever needing the original. Similarly, when $Original$ is already to be found somewhere publically, one wouldn't be able to publish $Patch$, because it will also open the door to reversing the original. This is quite inpractical, especially since a few modified images had already been published. To address this limitation, a protected formula is used, seen below.
+Given that the formula in the concept is only a difference, one could simply calculate $Reversed = Patch - Modified = Original$ without ever needing the original. Similarly, when $Modified$ is already to be found somewhere publically, one wouldn't be able to publish $Patch$, because it will also open the door to reversing the original. This is quite inpractical, especially since a few modified images had already been published. To address this limitation, a protected formula is used, seen below.
 
 $$
 Patch = Modified - Original + Noise(Seed(Original))
