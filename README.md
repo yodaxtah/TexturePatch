@@ -142,8 +142,6 @@ Notice that the original is a jpg, but the modified is a png. This is why the mo
 
 We took a publically availabe $720\times480$ image from [duion.com](https://duion.com/art/photos/cfdsc05592jpg) to test modified jpgs and upscaled with Upscayl to $4320\times2880$. Notice that the patch should still be a png to preserve as much information as possible, but even though it gets faithfully recreated, the data will be written and small changes invisible to the eye will occur -- this image will print out `(-19, 19)` for the difference between patched and modified.
 
-Notice that the original is a jpg, but the modified is not, whereas before, the original was a png and the modified as a png.
-
 - [original duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592.jpg)
 - [modified duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-modified.jpg)
 - [patch for duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patch.png)
