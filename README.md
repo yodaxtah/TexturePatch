@@ -27,7 +27,7 @@ $$
 What this tool will do (heavily simplified) is calculate its difference, and store it in a new image.
 
 $$
-Patch = Modified - Original = \begin{bmatrix}
+Patch_{naive} = Modified - Original = \begin{bmatrix}
 -1  & 0   & 0   \\
 -1  & 0   & 1   \\
 0   & -1  & 2    
@@ -41,13 +41,19 @@ We've made quite a few over simplifications.
 
 ## Protecting the original image from reversing
 
-Given that the formula in the concept is only a difference, one could simply calculate $Reversed = Patch - Modified = Original$ without ever needing the original. Similarly, when $Modified$ is already to be found somewhere publically, one wouldn't be able to publish $Patch$, because it will also open the door to reversing the original. This is quite inpractical, especially since a few modified images had already been published. To address this limitation, a protected formula is used, seen below.
+Given that the formula in the concept is only a difference, one could simply reverse-calculate the original without ever requiring legal access to it.
 
 $$
-Patch = Modified - Original + Noise(Seed(Original))
+Reversed = Patch_{naive} - Modified = Original
+$$
+
+Similarly, when $Modified$ is already to be found somewhere publically, one wouldn't be able to publish $Patch_{naive}$, because it will also open the door to reversing the original. This is quite inpractical, especially since a few modified images had already been published. To address this limitation, a protected formula is used, seen below.
+
+$$
+Patch_{protected} = Modified - Original + Noise(Seed(Original))
 $$
 $$
-Reversed = Modified - Patch + Noise(0) \neq Original
+Reversed = Modified - Patch_{protected} + Noise(0) \neq Original
 $$
 
 To correctly reverse the image, it is now necessary to have the original image (or just the seed), making the point of reversing the image pointless. The noise will have sufficiently high variance (currently 96) so that the reversed luminances will be too hard to correct, and the texture will be unusable as a texture. Moreover, the size information of the original texture is not added to the patch. This approach has the advantage that no key has to be shared around to share patches, they are extracted from the images individually.
