@@ -145,12 +145,12 @@ We took a publically availabe $720\times480$ image from [duion.com](https://duio
 Notice that the original is a jpg, but the modified is not, whereas before, the original was a png and the modified as a png.
 
 - [original duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592.jpg)
-- [modified duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-modified.png)
+- [modified duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-modified.jpg)
 - [patch for duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patch.png)
-- [patched duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patched.png)
-- [reversed duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-reversed.png)
-- [difference for modified and patched duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.png)
-- [difference for modified and reversed duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.png)
+- [patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-patched.jpg)
+- [reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-reversed.jpg)
+- [difference for modified and patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg)
+- [difference for modified and reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg)
 
 <!-- Features (shape) from the original image are not immediately present, but generally speaking, they are not random either. It can be said that with this approach much more information on the original image is hidden than uploading the manually upscaled image itself.
 
