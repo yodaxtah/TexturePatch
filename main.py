@@ -48,9 +48,6 @@ def reverse(modified_path_str: str, patch_path_str: str, reversed_path_str: str|
     modified_path = Path(modified_path_str)
     patch_path = Path(patch_path_str)
     reversed_path = Path(reversed_path_str)
-    print(modified_path)
-    print(patch_path)
-    print(reversed_path)
     # TODO: mk parents
     if modified_path.is_file() and patch_path.is_file():
         reverse_original(modified_path, patch_path, reversed_path)
