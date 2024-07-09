@@ -34,7 +34,13 @@ Patch_{naive} = Modified - Original = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-We've made quite a few over simplifications.
+If we'd like to create our own modified image, without ever being obtaining it elsewhere, we can simply calculate it as follows:
+
+$$
+Patched_{naive} = Patch_{naive} - Original = Modified
+$$
+
+We've made a few simplifications in this example.
 
 1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). In order to create a difference, the sizes should be the same. The only option really is to resize the original image to the new dimension with a standard method. (The tools uses cubic interpolation because the result is better and computation takes _longer_.)
 1. The difference of two 8-bit images can only be faithfully stored using 9-bit $(0-255, 255-0)$, whereas the patch itself will be an 8 bit image. The tool adds sign descriptors at the bottom of the image and stores the absolute difference.
@@ -70,7 +76,7 @@ Help can be found for each command running `main.py --help` and `main.py create 
 
 ### `create`
 
-Running the following command will create a patch texture in [./demo/crate-brown-wood-patch.png](./demo/crate-brown-wood-patch.png) given the paths to the original and modified textures. This method currently also works recursively on directories.
+Running the following command will create a patch texture [crate-brown-wood-patch.png](./demo/crate-brown-wood-patch.png) given the paths to the original and modified textures. This method currently also works recursively on directories.
 
 ```console
 python main.py create ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patch.png
@@ -78,7 +84,7 @@ python main.py create ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-modifi
 
 ### `apply`
 
-Running the following command will apply the patch to the original texture in [./demo/crate-brown-wood-patch.png](./demo/crate-brown-wood-patch.png). This method currently also works recursively on directories.
+Running the following command will apply the patch to the original texture and create [crate-brown-wood-patch.png](./demo/crate-brown-wood-patch.png). This method currently also works recursively on directories.
 
 ```console
 python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.png ./demo/crate-brown-wood-patched.png
@@ -86,13 +92,13 @@ python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.p
 
 ### `diff`
 
-As a patch creator, one can ensure it matches exactly by running the following command, which will print `(min, max)` ~~_only if there is a difference_~~. The following command compares the modified and patched images, which will (should!) have 0 difference, and thus will not print anything.
+A patch creator can ensure their patches will apply well matches exactly by running the following command, which will print `(min, max)` ~~_only if there is a difference_~~. The following command compares the modified and patched images, which will (should!) have 0 difference, and thus will not print anything.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png # may only prints if there is a difference!
 ```
 
-Adding a third path will always generate a difference image, in which white represents little change, blue represents luminance decrease and red represents luminance increase. Since this is a view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image at [./demo/crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). The naming behavior will change in the future.
+Adding a third path will always generate a difference image, in which white represents little change, blue represents luminance decrease and red represents luminance increase. Since this is a view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image [crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). The naming behavior will change in the future.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png ./demo/crate-brown-wood-difference-modified-patched.png
@@ -100,7 +106,7 @@ python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood
 
 ### `reverse`
 
-Finally, to see if the noise is large enough, the following command will create a reversed image at [./demo/crate-brown-wood-reversed.png](./demo/crate-brown-wood-patch.png) with using 0 for each noise value -- since the original is presumed not to be accessible and thus unknown.
+Finally, to see if the noise is large enough, the following command will create a reversed image [crate-brown-wood-reversed.png](./demo/crate-brown-wood-patch.png) with using 0 for each noise value -- since the original is presumed not to be accessible and thus unknown.
 
 ```console
 python main.py reverse ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patch.png ./demo/crate-brown-wood-reversed.png
@@ -134,13 +140,24 @@ Conceptually speaking, the difference between two similar images should be small
 
 We took a publically avaiable $512\times512$ texture for a wooden crate from [opengameart.org](https://opengameart.org/content/box-and-barrel-textures-crate-brown-wood.jpg). This image had been shamelessly upscaled using the FOSS [Upscayl](https://github.com/upscayl/upscayl) application to a $2560\times2560$ image. All textures this tool generates can be found in [demo](./demo/).
 
-- [original crate-brown-wood in jpg](./demo/crate-brown-wood.jpg)
-- [modified crate-brown-wood in png](./demo/crate-brown-wood-modified.png)
-- [patch for crate-brown-wood in png](./demo/crate-brown-wood-patch.png)
-- [patched crate-brown-wood in png](./demo/crate-brown-wood-patched.png)
-- [reversed crate-brown-wood in png](./demo/crate-brown-wood-reversed.png)
-- [difference for modified and patched crate-brown-wood in png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png)
-- [difference for modified and reversed crate-brown-wood in png](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png)
+<!-- - [original crate-brown-wood in jpg](./demo/crate-brown-wood.jpg) -->
+<!-- - [modified crate-brown-wood in png](./demo/crate-brown-wood-modified.png) -->
+<!-- - [patch for crate-brown-wood in png](./demo/crate-brown-wood-patch.png) -->
+<!-- - [patched crate-brown-wood in png](./demo/crate-brown-wood-patched.png) -->
+<!-- - [reversed crate-brown-wood in png](./demo/crate-brown-wood-reversed.png) -->
+<!-- - [difference between modified and patched crate-brown-wood in png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png) -->
+<!-- - [difference between modified and reversed crate-brown-wood in png](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png) -->
+<!-- <img alt="original crate-brown-wood in jpg" src="./demo/crate-brown-wood.jpg" width="20%" /> -->
+<!-- <img alt="modified crate-brown-wood in png" src="./demo/crate-brown-wood-modified.png" width="20%" /> -->
+<!-- <img alt="patch for crate-brown-wood in png" src="./demo/crate-brown-wood-patch.png" width="20%" /> -->
+<!-- <img alt="patched crate-brown-wood in png" src="./demo/crate-brown-wood-patched.png" width="20%" /> -->
+<!-- <img alt="reversed crate-brown-wood in png" src="./demo/crate-brown-wood-reversed.png" width="20%" /> -->
+<!-- <img alt="difference between modified and patched crate-brown-wood in png" src="./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png" width="20%" /> -->
+<!-- <img alt="difference between modified and reversed crate-brown-wood in png" src="./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png" width="20%" /> -->
+
+| <center>[$Original$](./demo/crate-brown-wood.jpg)</center> | <center>[$Modified$](./demo/crate-brown-wood-modified.png)</center> | <center>[$Patch$](./demo/crate-brown-wood-patch.png)</center> | <center>[$Patched$](./demo/crate-brown-wood-patched.png)</center> | <center>[$Reversed$](./demo/crate-brown-wood-reversed.png)</center> | <center>[$Diff(M,P)$](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png)</center> | <center>[$Diff(M,R)$](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png)</center> |
+|-|-|-|-|-|-|-|
+| <img alt="original crate-brown-wood in jpg" src="./demo/crate-brown-wood.jpg" width="100px" /> | <img alt="modified crate-brown-wood in png" src="./demo/crate-brown-wood-modified.png" width="100px" /> | <img alt="patch for crate-brown-wood in png" src="./demo/crate-brown-wood-patch.png" width="100px" /> | <img alt="patched crate-brown-wood in png" src="./demo/crate-brown-wood-patched.png" width="100px" /> | <img alt="reversed crate-brown-wood in png" src="./demo/crate-brown-wood-reversed.png" width="100px" /> | <img alt="difference between modified and patched crate-brown-wood in png" src="./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png" width="100px" /> | <img alt="difference between modified and reversed crate-brown-wood in png" src="./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png" width="100px" /> |
 
 Notice that the original is a jpg, but the modified is a png. This is why the modified texture can still be faithfully recreated with the patch, unlike the next texture, which has a modified jpg texture.
 
@@ -148,13 +165,17 @@ Notice that the original is a jpg, but the modified is a png. This is why the mo
 
 We took a publically availabe $720\times480$ image from [duion.com](https://duion.com/art/photos/cfdsc05592jpg) to test modified jpgs and upscaled with Upscayl to $4320\times2880$. Notice that the patch should still be a png to preserve as much information as possible, but even though it gets faithfully recreated, the data will be written and small changes invisible to the eye will occur -- this image will print out `(-19, 19)` for the difference between patched and modified.
 
-- [original duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592.jpg)
-- [modified duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-modified.jpg)
-- [patch for duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patch.png)
-- [patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-patched.jpg)
-- [reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-reversed.jpg)
-- [difference for modified and patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg)
-- [difference for modified and reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg)
+<!-- - [original duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592.jpg) -->
+<!-- - [modified duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-modified.jpg) -->
+<!-- - [patch for duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patch.png) -->
+<!-- - [patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-patched.jpg) -->
+<!-- - [reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-reversed.jpg) -->
+<!-- - [difference between modified and patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg) -->
+<!-- - [difference between modified and reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg) -->
+
+| <center>[$Original$](./demo/duion-art-photos-CF_DSC05592.jpg)</center> | <center>[$Modified$](./demo/duion-art-photos-CF_DSC05592-modified.jpg)</center> | <center>[$Patch$](./demo/duion-art-photos-CF_DSC05592-patch.png)</center> | <center>[$Patched$](./demo/duion-art-photos-CF_DSC05592-patched.jpg)</center> | <center>[$Reversed$](./demo/duion-art-photos-CF_DSC05592-reversed.jpg)</center> | <center>[$Diff(M,P)$](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg)</center> | <center>[$Diff(M,R)$](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg)</center> |
+|-|-|-|-|-|-|-|
+| <img alt="original duion-art-photos-CF_DSC05592 in jpg" src="./demo/duion-art-photos-CF_DSC05592.jpg" width="100px" /> | <img alt="modified duion-art-photos-CF_DSC05592 in jpg" src="./demo/duion-art-photos-CF_DSC05592-modified.jpg" width="100px" /> | <img alt="patch for duion-art-photos-CF_DSC05592 in png" src="./demo/duion-art-photos-CF_DSC05592-patch.png" width="100px" /> | <img alt="patched duion-art-photos-CF_DSC05592 in png" src="./demo/duion-art-photos-CF_DSC05592-patched.jpg" width="100px" /> | <img alt="reversed duion-art-photos-CF_DSC05592 in png" src="./demo/duion-art-photos-CF_DSC05592-reversed.jpg" width="100px" /> | <img alt="difference between modified and patched duion-art-photos-CF_DSC05592 in png" src="./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg" width="100px" /> | <img alt="difference between modified and reversed duion-art-photos-CF_DSC05592 in png" src="./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg" width="100px" /> |
 
 <!-- Features (shape) from the original image are not immediately present, but generally speaking, they are not random either. It can be said that with this approach much more information on the original image is hidden than uploading the manually upscaled image itself.
 
