@@ -21,12 +21,13 @@ def test_patch(original_path: Path, modified_path: Path) -> None:
 
 
 def test() -> None:
-    test_patch(Path("./demo/hud-powercell.png"), Path("./demo/hud-powercell-modified.png"))
-    test_patch(Path("./demo/assis-choker.png"), Path("./demo/assis-choker-modified.png"))
-    test_patch(Path("./demo/dc-handle-02.png"), Path("./demo/dc-handle-02-modified.png"))
-    test_patch(Path("./demo/buzzerfly-icon.png"), Path("./demo/buzzerfly-icon-modified.png"))
-    test_patch(Path("./demo/crate-brown-wood.jpg"), Path("./demo/crate-brown-wood-modified.png"))
-    test_patch(Path("./demo/duion-art-photos-CF_DSC05592.jpg"), Path("./demo/duion-art-photos-CF_DSC05592-modified.jpg"))
+    destination = Path("./test/image")
+    test_patch(destination.joinpath("./hud-powercell.png"), destination.joinpath("./hud-powercell-modified.png"))
+    test_patch(destination.joinpath("./assis-choker.png"), destination.joinpath("./assis-choker-modified.png"))
+    test_patch(destination.joinpath("./dc-handle-02.png"), destination.joinpath("./dc-handle-02-modified.png"))
+    test_patch(destination.joinpath("./buzzerfly-icon.png"), destination.joinpath("./buzzerfly-icon-modified.png"))
+    test_patch(destination.joinpath("./crate-brown-wood.jpg"), destination.joinpath("./crate-brown-wood-modified.png"))
+    test_patch(destination.joinpath("./duion-art-photos-CF_DSC05592.jpg"), destination.joinpath("./duion-art-photos-CF_DSC05592-modified.jpg"))
 
 if __name__ == "__main__":
     test()
