@@ -1,32 +1,9 @@
 from transform import signed, sign_shifted_image, sign_unshifted_image, remainder_ceil, remainder_modulo, resized_to_shape, max_luminance
+from filters import create_noise_image, NOISE_VARIANCE
 
 import cv2
 import numpy as np
 from pathlib import Path
-
-
-NOISE_VARIANCE = 96
-
-
-def extract_seed(image: np.ndarray) -> np.ndarray:
-    height, width, number_of_channels = [int(i) for i in image.shape]
-    minimum = int(image.min())
-    maximum = int(image.max())
-    summation = int(image.sum())
-    sample_sum1 = int(image.reshape(-1)[0::17].sum()) # https://stackoverflow.com/questions/25876640/subsampling-every-nth-entry-in-a-numpy-array
-    sample_sum2 = int(image.reshape(-1)[1::23].sum()) # https://stackoverflow.com/questions/25876640/subsampling-every-nth-entry-in-a-numpy-array
-    seed = width * height * (maximum - minimum) + summation - sample_sum1 * number_of_channels - sample_sum2
-    return seed
-
-
-def create_noise_image(image: np.ndarray, variance: float = 20) -> np.ndarray:
-    assert variance in range(0, max_luminance(image)+1), "variance not in image range"
-    height, width, _ = image.shape
-    np.random.seed(seed=extract_seed(image) % max_luminance(np.dtype(np.uint32)))
-    noise = np.random.rand(*image.shape) * variance * (1 if image.dtype == np.int16 else 256)
-    if noise.shape[2] > 3:
-        noise[:,:,3] = 0
-    return noise.astype(np.uint8 if image.dtype == np.int16 else np.uint16)
 
 
 def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
