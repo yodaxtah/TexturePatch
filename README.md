@@ -1,6 +1,8 @@
 # TexturePatch
 
-TexturePatch is currently a proof-of-concept tool to create patches to a texture. Many old games have low quality textures, and by hand or by A.I. these can often get upscaled for use in emulators for that console. The problem is however that these textures are copy righted. People that possess a game and are able to extract the textures can enhance them, but they can't share them, as that would be in violation to that copy right.
+Many game console emulators allow users to extract and replace textures, while decompiled games also provide opportunities to upscale and clean up their visuals. However, the legal landscape surrounding these texture modifications is complex. Players are generally free to tinker with textures they've extracted from games they own. But sharing those enhanced assets publicly would likely infringe on the original copyright holders' intellectual property rights.
+
+This is where the TexturePatch tool comes into play. TexturePatch is a proof-of-concept tool that enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
 
 ## Concept
 
@@ -37,12 +39,12 @@ $$
 If we'd like to create our own modified image, without ever being obtaining it elsewhere, we can simply calculate it as follows:
 
 $$
-Patched_{naive} = Patch_{naive} - Original = Modified
+Patched_{naive} = Original + Patch_{naive} = Modified
 $$
 
 We've made a few simplifications in this example.
 
-1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). In order to create a difference, the sizes should be the same. The only option really is to resize the original image to the new dimension with a standard method. (The tools uses cubic interpolation because the result is better and computation takes _longer_.)
+1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). In order to create a difference (patch), the sizes should be the same. The only option is to resize the original image to the new dimension using a standard method. The tool uses cubic interpolation, as it produces better results and computation takes _longer_.
 1. The difference of two 8-bit images can only be faithfully stored using 9-bit $(0-255, 255-0)$, whereas the patch itself will be an 8 bit image. The tool adds sign descriptors at the bottom of the image and stores the absolute difference.
 
 ## Protecting the original image from reversing
@@ -140,20 +142,6 @@ Conceptually speaking, the difference between two similar images should be small
 
 We took a publically avaiable $512\times512$ texture for a wooden crate from [opengameart.org](https://opengameart.org/content/box-and-barrel-textures-crate-brown-wood.jpg). This image had been shamelessly upscaled using the FOSS [Upscayl](https://github.com/upscayl/upscayl) application to a $2560\times2560$ image. All textures this tool generates can be found in [demo](./demo/).
 
-<!-- - [original crate-brown-wood in jpg](./demo/crate-brown-wood.jpg) -->
-<!-- - [modified crate-brown-wood in png](./demo/crate-brown-wood-modified.png) -->
-<!-- - [patch for crate-brown-wood in png](./demo/crate-brown-wood-patch.png) -->
-<!-- - [patched crate-brown-wood in png](./demo/crate-brown-wood-patched.png) -->
-<!-- - [reversed crate-brown-wood in png](./demo/crate-brown-wood-reversed.png) -->
-<!-- - [difference between modified and patched crate-brown-wood in png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png) -->
-<!-- - [difference between modified and reversed crate-brown-wood in png](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png) -->
-<!-- <img alt="original crate-brown-wood in jpg" src="./demo/crate-brown-wood.jpg" width="20%" /> -->
-<!-- <img alt="modified crate-brown-wood in png" src="./demo/crate-brown-wood-modified.png" width="20%" /> -->
-<!-- <img alt="patch for crate-brown-wood in png" src="./demo/crate-brown-wood-patch.png" width="20%" /> -->
-<!-- <img alt="patched crate-brown-wood in png" src="./demo/crate-brown-wood-patched.png" width="20%" /> -->
-<!-- <img alt="reversed crate-brown-wood in png" src="./demo/crate-brown-wood-reversed.png" width="20%" /> -->
-<!-- <img alt="difference between modified and patched crate-brown-wood in png" src="./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png" width="20%" /> -->
-<!-- <img alt="difference between modified and reversed crate-brown-wood in png" src="./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png" width="20%" /> -->
 
 | <center>[$Original$](./demo/crate-brown-wood.jpg)</center> | <center>[$Modified$](./demo/crate-brown-wood-modified.png)</center> | <center>[$Patch$](./demo/crate-brown-wood-patch.png)</center> | <center>[$Patched$](./demo/crate-brown-wood-patched.png)</center> | <center>[$Reversed$](./demo/crate-brown-wood-reversed.png)</center> | <center>[$Diff(M,P)$](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png)</center> | <center>[$Diff(M,R)$](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png)</center> |
 |-|-|-|-|-|-|-|
@@ -164,14 +152,6 @@ Notice that the original is a jpg, but the modified is a png. This is why the mo
 ### CF_DSC05592.jpg
 
 We took a publically availabe $720\times480$ image from [duion.com](https://duion.com/art/photos/cfdsc05592jpg) to test modified jpgs and upscaled with Upscayl to $4320\times2880$. Notice that the patch should still be a png to preserve as much information as possible, but even though it gets faithfully recreated, the data will be written and small changes invisible to the eye will occur -- this image will print out `(-19, 19)` for the difference between patched and modified.
-
-<!-- - [original duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592.jpg) -->
-<!-- - [modified duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-modified.jpg) -->
-<!-- - [patch for duion-art-photos-CF_DSC05592 in png](./demo/duion-art-photos-CF_DSC05592-patch.png) -->
-<!-- - [patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-patched.jpg) -->
-<!-- - [reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-reversed.jpg) -->
-<!-- - [difference between modified and patched duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg) -->
-<!-- - [difference between modified and reversed duion-art-photos-CF_DSC05592 in jpg](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg) -->
 
 | <center>[$Original$](./demo/duion-art-photos-CF_DSC05592.jpg)</center> | <center>[$Modified$](./demo/duion-art-photos-CF_DSC05592-modified.jpg)</center> | <center>[$Patch$](./demo/duion-art-photos-CF_DSC05592-patch.png)</center> | <center>[$Patched$](./demo/duion-art-photos-CF_DSC05592-patched.jpg)</center> | <center>[$Reversed$](./demo/duion-art-photos-CF_DSC05592-reversed.jpg)</center> | <center>[$Diff(M,P)$](./demo/duion-art-photos-CF_DSC05592-difference-modified-patched-duion-art-photos-CF_DSC05592-modified-duion-art-photos-CF_DSC05592-patched.jpg)</center> | <center>[$Diff(M,R)$](./demo/duion-art-photos-CF_DSC05592-difference-reversed-patched-duion-art-photos-CF_DSC05592-reversed-duion-art-photos-CF_DSC05592-patched.jpg)</center> |
 |-|-|-|-|-|-|-|
