@@ -202,17 +202,31 @@ We did not bother to additionally write an algorithm with $Noise(0)$ to view wha
 <!-- TODO: Example image here. -->
 
 
+## Roadmap
+
+In its current state, three packs (Dash's, Jak 1 HD UI, JAK 1 ESGRAN) have been created and applied to Windows, and match exactly. With the exception of an assertion going off (as intended) for 12 images in the last pack -- images that have a width larger than the header. It also has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches.
+
+Given that the concept has been implemented to most extent, there isn 't much left planned. Here are a few things.
+
+- Fix that assertion bug
+- Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
+- Try out new packs (and fix new bugs probably)
+- Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
+- Support directories for `diff`, `test`, `test-filter`
+- Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.
+    ```python
+    >>> import cv2
+    >>> image = cv2.imread("./demo/logo.png", cv2.IMREAD_UNCHANGED) # 1.16 MB
+    >>> cv2.imwrite("./demo/logo-written.png", image) # suddenly 1.31 MB
+    True
+    ```
+
 ## Q & A
 
 1. _Can't someone publish these keys and a modification of a reversing algorithm to extract the original images that requires just the patch and the modified textures?_ Sure, but in any case, they can just as well upload the original or modified textures, which is much less of a hassle.
 1. _Are 16-bit png images are supported?_ Yes, but no. The patching works, but it is not yet meant to be used. The original image has to be scaled (**which is currently not the case!**), otherwise, there will be very little difference visible (0-255) compared to (0-65535), and the patch can be just downsampled, creating a very good attempt at reversing the original.
 1. _Are jpgs supported?_ JPGs are a lossy format (that I personally wouldn't expect for games), thus to create a patch for them that results in the exact same jpg is unlikely. The tool creates a png patch, but upon storing the eventual patched image as jpg, some of the data gets lost. This would/should be the case as well when reading and directly writing the image -- yet to be tried. These differences are hardly visible to the eye.
 1. _What are these iccp warnings?_ I'm not sure exactly ([some corruption of the modified image](https://stackoverflow.com/questions/22745076/libpng-warning-iccp-known-incorrect-srgb-profile)), but the goal is to exactly recreate the image. If the modified image is corrupted before patched, then the eventual patched image will have it too.
-1. _What needs to be done?_
-    - All textures from Dash 's pack have been patched without immediate error (a few images in the replacement pack exist that are not present in the decompiled images). Further testing is necessary to find more bugs before the tool is actually used. The format of the patch could change after all, which would become annoying when a patch uses the old format.
-    - Platform specific quirks should be tested, so that the result is the same.
-    - Decent CLI should be provided.
-    - Perhaps store the patch(ed) image with a different library. [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are exactly the same.
 1. _Is this method safe?_ For now, I'd say yes. However, I strongly suspect this hashing is not quantum computing safe, as most contemporary encryption algorithms. Since "only" $2^{32}-1$ keys exist, so for each image, one could just try them all at once with a quantum computer and determine which match the best with the modified image using an algorithm. But then again, it takes quite a lot of effort. This should only be a concern for the game company that 1) may want to publish patches (which is unlikely, because why not provide an update to do so instead), or 2) allows artists to publish patches on publically unavailable textures (but that in itself is already extremely unlikely). All the other people that have the goal of finding the original textures waste much less time searching for them online, sadly.
 1. _Can't the shapes of patches be used to recreate a texture_ I don't know, but let's say no. I have almost no photoshop skills. The craziest I could think of are people aligning screenshots of gameplay with shapes in patches, in which way they would have a name and eventually a texture they can modify or use as-is, but as usual, what would be the point. In case the textures hadn't been published before, they would presumably have to spend a lot of time figuring out which texture it is. I welcome anyone to attempts these extreme scenario's.
 <!-- . When that time comes, the textures should be taken offline. It still extra work to reverse a patch and a modified version to the original image, but it is certainly possible. At the same time. I don't expect anyone to put in the effort to reverse textures, if they can be found somewhere. The only unsafe use case is when this were to be used by a company that allowed artists to work on the original textures and publish them as patches. Anyone else will just grab them somewhere -- it is way too time consuming to reverse this! -->
