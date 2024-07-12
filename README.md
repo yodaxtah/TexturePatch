@@ -68,7 +68,15 @@ To correctly reverse the image, it is now necessary to have the original image (
 
 Again, simplifications are made. Now, the range is no longer 9 bit (to maximally represent $(-256, 255)$), since the noise can overflow it. With $(0,n)$ being the range for the noise, the total patch range would become $(0-255+0, 255-0+n)$. Additional data will have to be stored. The lazy solution was to just add the occassions where the noise was inverted. This will be visible as the other row of mini textures.
 
-Patterns could be used to swap/shift pixels that require the seed to make reversing even more difficult. In fact, simple pattern swaps (i.e. rotating pixels on black tiles of the chess board) that don't require the seed will already make it hard for most people to do something practically with the patch or a reversed image, but these patterns are also easy to revert with scripting knowledge, since the algorithm can be inspected.
+## Protecting the visible shapes
+
+Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e. "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is the somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
+<!-- These small differences tend to give away the edges present in a texture -- the overal shape. This is currently a consideration to make when using the tool. On the other hand, the colors can't be reversed, nor the size of the orignal image. Someone that does not have access to the original textures is time-wise better of obtaining them somewhere online illegally, than doing manual cleaning of the edges. (Attempts are welcome to see the effectiveness!) -->
+
+
+More importantly, the differences between the original and modified image are the largest when there is a lot of local correction. These are often sharp edges of a logo, or drawn objects. These sharp images appear among texture packs more often than you'd expect. With photoshop tools, these edges can probably be extracted and used to repaint a new texture. Hence, the need arises to further obscure the visual space. On one hand, it is nice to recognize the images, especially for debugging, but on the other hand, it shouldn't be too easy to photoshop it.
+
+Simple pattern swaps (i.e. rotating pixels on black tiles of the chess board) that don't require a seed will already make it hard for most people to do something practical with the patch or a reversed image, but these patterns are also easy to revert with scripting knowledge, since the algorithm can be inspected. (It definitelly won't help that we provide a filtering and filter-reversing tools ourselves!) Patterns can also incorporate noise to determine swap and/or shift positions, which is what we will end up doing.
 
 ## Usage
 
@@ -94,13 +102,13 @@ python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.p
 
 ### `diff`
 
-A patch creator can ensure their patches will apply well matches exactly by running the following command, which will print `(min, max)` ~~_only if there is a difference_~~. The following command compares the modified and patched images, which will (should!) have 0 difference, and thus will not print anything.
+A patch creator can ensure their patches will apply well matches exactly by running the following command. It will print `(min, max)`, in the case of the specific command `(0, 0)` since an pixel-wise comparison between the images is always 0.
 
 ```console
-python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png # may only prints if there is a difference!
+python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png
 ```
 
-Adding a third path will always generate a difference image, in which white represents little change, blue represents luminance decrease and red represents luminance increase. Since this is a view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image [crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). The naming behavior will change in the future.
+Adding a third path will always generate a difference image, in which completely white represents no change, blue represents luminance decrease and red represents luminance increase. Since this is a view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image [crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). The naming behavior will change in the future.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png ./demo/crate-brown-wood-difference-modified-patched.png
@@ -134,14 +142,27 @@ python main.py reverse ./demo/crate-brown-wood-modified.png ./demo/crate-brown-w
 python main.py diff    ./demo/crate-brown-wood-reversed.png ./demo/crate-brown-wood-patched.png  ./demo/crate-brown-wood-difference-reversed-patched.png
 ```
 
+### `test-filter`
+
+To preview the effectiveness of a filter, one can apply them to a certain image. Some filters require a seed (image) to invert them, which is when `--seed` must be provided for both applying and removing a filter. Providing no seed will use the first image as a seed.
+
+```console
+python main.py test-filter ./demo/logo-patch.jpg ./demo/logo-patch-filtered.png filter1 filter2 filter3
+```
+
+To remove the filters, simply prepend the names with `i` and **reverse the order of the filters**.
+
+```console
+python main.py test-filter ./demo/logo-filtered.jpg ./demo/logo-patch-inverted.png ifilter3 ifilter2 ifilter1
+```
+
 ## Demo
 
-Conceptually speaking, the difference between two similar images should be small, and size of the image should also be smaller. Of course, heavy noise is added, which goes against image compression algorithms. Besides that point, these small differences tend to give away the edges present in a texture -- the overal shape. This is currently a consideration to make when using the tool. On the other hand, the colors can't be reversed, nor the size of the orignal image. Someone that does not have access to the original textures is time-wise better of obtaining them somewhere online illegally, than doing manual cleaning of the edges. (Attempts are welcome to see the effectiveness!)
+To demonstrate the results, we'll show two images that are patched and lastly demonstrate filters for further obfuscation.
 
 ### crate-brown-wood.jpg
 
-We took a publically avaiable $512\times512$ texture for a wooden crate from [opengameart.org](https://opengameart.org/content/box-and-barrel-textures-crate-brown-wood.jpg). This image had been shamelessly upscaled using the FOSS [Upscayl](https://github.com/upscayl/upscayl) application to a $2560\times2560$ image. All textures this tool generates can be found in [demo](./demo/).
-
+We took a publically avaiable $512\times512$ texture for a wooden crate from [opengameart.org](https://opengameart.org/content/box-and-barrel-textures-crate-brown-wood.jpg). This image had been shamelessly upscaled using [Upscayl](https://github.com/upscayl/upscayl) to a $2560\times2560$ image. All textures the tool has generated for this image can be found in [demo](./demo/).
 
 | <center>[$Original$](./demo/crate-brown-wood.jpg)</center> | <center>[$Modified$](./demo/crate-brown-wood-modified.png)</center> | <center>[$Patch$](./demo/crate-brown-wood-patch.png)</center> | <center>[$Patched$](./demo/crate-brown-wood-patched.png)</center> | <center>[$Reversed$](./demo/crate-brown-wood-reversed.png)</center> | <center>[$Diff(M,P)$](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png)</center> | <center>[$Diff(M,R)$](./demo/crate-brown-wood-difference-reversed-patched-crate-brown-wood-reversed-crate-brown-wood-patched.png)</center> |
 |-|-|-|-|-|-|-|
@@ -161,6 +182,26 @@ We took a publically availabe $720\times480$ image from [duion.com](https://duio
 
 It is clearly not just a random image. The patch in itself will contain some information on the texture. This can be obfuscated visually, but it will be there either way in some form. -->
 
+### Jak and daxter: The Precursor Legacy logo
+
+For this test, we took the [logo](https://static.wikia.nocookie.net/jakanddaxter/images/1/14/The_Precursor_Legacy_logo_2.png/revision/latest?cb=20180531194636) from the Jak and Daxter wiki and downscaled it using `cv2.resize` -- it looked too good already! (In all seriousness, old games probably have small images, whereas nowadays _bigger is better<sup>TM</sup>_ thus we should test for large upscales starting from small images.) Then we created a patch.
+
+Now, applying filters to this patch separately. Once can exactly reverse this image. Notice how only the outline is visible. This is simply because the pixels in between have the same alpha channel, and they can subtracted from each other. In case these are not similar, information will be visible. For demo purposes, we divided the alpha channel by two, and added $128$, to ensure all values are in the range $(128, 255)$. Below are upscales 32, 16, 8, 4, 2 each on a separate row to demonstrate the effectiveness of the filters `roll-h roll-v`. Since they can be reversed given the seed, they of course have 0 differences (white images).
+
+| <center>patched</center> | <center>alpha-shifted</center> | <center>filtered (roll)</center> | <center>inversed</center> | <center>difference</center> |
+|-|-|-|-|-|
+| <img alt="patched logo for 32x upscale" src="./demo/logo-patch-32.png" width="120px" /> | <img alt="alpha shifted logo for 32x upscale" src="./demo/logo-patch-32-shifted.png" width="120px" /> | <img alt="filtered logo for 32x upscale" src="./demo/logo-filtered-32.png" width="120px" /> | <img alt="inverted logo for 32x upscale" src="./demo/logo-inverted-32.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-32-logo-patch-32-logo-inverted-32.png" width="120px" /> |
+| <img alt="patched logo for 32x upscale" src="./demo/logo-patch-16.png" width="120px" /> | <img alt="alpha shifted logo for 16x upscale" src="./demo/logo-patch-16-shifted.png" width="120px" /> | <img alt="filtered logo for 16x upscale" src="./demo/logo-filtered-16.png" width="120px" /> | <img alt="inverted logo for 16x upscale" src="./demo/logo-inverted-16.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-16-logo-patch-16-logo-inverted-16.png" width="120px" /> |
+| <img alt="patched logo for 8x upscale" src="./demo/logo-patch-8.png" width="120px" /> | <img alt="alpha shifted logo for 8x upscale" src="./demo/logo-patch-8-shifted.png" width="120px" /> | <img alt="filtered logo for 8x upscale" src="./demo/logo-filtered-8.png" width="120px" /> | <img alt="inverted logo for 8x upscale" src="./demo/logo-inverted-8.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-8-logo-patch-8-logo-inverted-8.png" width="120px" /> |
+| <img alt="patched logo for 4x upscale" src="./demo/logo-patch-4.png" width="120px" /> | <img alt="alpha shifted logo for 4x upscale" src="./demo/logo-patch-4-shifted.png" width="120px" /> | <img alt="filtered logo for 4x upscale" src="./demo/logo-filtered-4.png" width="120px" /> | <img alt="inverted logo for 4x upscale" src="./demo/logo-inverted-4.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-4-logo-patch-4-logo-inverted-4.png" width="120px" /> |
+| <img alt="patched logo for 2x upscale" src="./demo/logo-patch-2.png" width="120px" /> | <img alt="alpha shifted logo for 2x upscale" src="./demo/logo-patch-2-shifted.png" width="120px" /> | <img alt="filtered logo for 2x upscale" src="./demo/logo-filtered-2.png" width="120px" /> | <img alt="inverted logo for 2x upscale" src="./demo/logo-inverted-2.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-2-logo-patch-2-logo-inverted-2.png" width="120px" /> |
+
+
+We did not bother to additionally write an algorithm with $Noise(0)$ to view what it would look like without the correct seed. For some filters, it would simply do nothing! Or, just use any other `--seed` that previously used, it will also look off.
+
+<!-- TODO: Example image here. -->
+
+
 ## Q & A
 
 1. _Can't someone publish these keys and a modification of a reversing algorithm to extract the original images that requires just the patch and the modified textures?_ Sure, but in any case, they can just as well upload the original or modified textures, which is much less of a hassle.
@@ -172,6 +213,7 @@ It is clearly not just a random image. The patch in itself will contain some inf
     - Platform specific quirks should be tested, so that the result is the same.
     - Decent CLI should be provided.
     - Perhaps store the patch(ed) image with a different library. [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are exactly the same.
-1. _Is this method safe?_ For now, I'd say yes. However, I strongly suspect this hashing is not quantum computing safe "only" $2^{32}-1$ keys exist, so for each image, one could just try them all at once with a quantum computer and determine which match the best with the modified image using an algorithm. But then again, it takes quite a lot of effort. This should only be a concern for the game company that could be publishing patches, or allows artists to publish patches on publically unavailable textures. But that in itself is already extremely unlikely! All the other people that have the goal of finding the original textures waste much less time searching for them online, sadly.
+1. _Is this method safe?_ For now, I'd say yes. However, I strongly suspect this hashing is not quantum computing safe, as most contemporary encryption algorithms. Since "only" $2^{32}-1$ keys exist, so for each image, one could just try them all at once with a quantum computer and determine which match the best with the modified image using an algorithm. But then again, it takes quite a lot of effort. This should only be a concern for the game company that 1) may want to publish patches (which is unlikely, because why not provide an update to do so instead), or 2) allows artists to publish patches on publically unavailable textures (but that in itself is already extremely unlikely). All the other people that have the goal of finding the original textures waste much less time searching for them online, sadly.
+1. _Can't the shapes of patches be used to recreate a texture_ I don't know, but let's say no. I have almost no photoshop skills. The craziest I could think of are people aligning screenshots of gameplay with shapes in patches, in which way they would have a name and eventually a texture they can modify or use as-is, but as usual, what would be the point. In case the textures hadn't been published before, they would presumably have to spend a lot of time figuring out which texture it is. I welcome anyone to attempts these extreme scenario's.
 <!-- . When that time comes, the textures should be taken offline. It still extra work to reverse a patch and a modified version to the original image, but it is certainly possible. At the same time. I don't expect anyone to put in the effort to reverse textures, if they can be found somewhere. The only unsafe use case is when this were to be used by a company that allowed artists to work on the original textures and publish them as patches. Anyone else will just grab them somewhere -- it is way too time consuming to reverse this! -->
 
