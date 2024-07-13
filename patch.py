@@ -1,5 +1,5 @@
 from transform import signed, sign_shifted_image, sign_unshifted_image, remainder_ceil, remainder_modulo, resized_to_shape, max_luminance
-from filters import create_noise_image, NOISE_VARIANCE
+from filters import create_noise_image, apply_filters, NOISE_VARIANCE
 
 import cv2
 import numpy as np
@@ -112,3 +112,10 @@ def create_patched(original_path: Path, patch_path: Path, patched_path: Path):
     patched_image: np.ndarray = patched.astype(shifted_image.dtype)
     # patched_image[:,:,3] = 0
     cv2.imwrite(patched_path, patched_image)
+
+
+def filter_image(image_path: Path, filtered_path: Path, seed_image_path: Path, fitler_names: list[str], inverted: bool = False):
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    seed_image = cv2.imread(seed_image_path, cv2.IMREAD_UNCHANGED)
+    filtered = apply_filters(image, seed_image, fitler_names, inverted)
+    cv2.imwrite(filtered_path, filtered)

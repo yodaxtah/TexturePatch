@@ -1,11 +1,11 @@
 import argparse
 from pathlib import Path
 
-from patch import create_patch, create_patched
+from patch import create_patch, create_patched, filter_image
 from difference import compare_image, reverse_original
 from test import test_patch
 from pack import create_texture_pack, create_texture_patch_pack
-from filters import filter_image, FITLER_NAMES
+from filters import FITLER_NAMES
 
 
 def create(original_path: Path, modified_path: Path, patch_path: Path):
@@ -56,8 +56,9 @@ def test(original_path: Path, modified_path: Path):
         print("Expected either all directories or all images")
 
 
-def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], seed_image_path: Path|None):
-    filter_image(image_path, filtered_path, fitler_names, seed_image_path if seed_image_path else image_path)
+def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], seed_image_path: Path|None, inverted: bool = False):
+    seed_image_path_ = seed_image_path if seed_image_path else image_path
+    filter_image(image_path, filtered_path, seed_image_path_, fitler_names, inverted)
 
 
 def main():
@@ -115,6 +116,8 @@ def main():
         help="The names of the filters to apply")
     filter_parser.add_argument("-s", "--seed", dest="seed_image_path", metavar="seed-image-path", type=Path, default=None,
         help="The path to the image that is used as a seed")
+    filter_parser.add_argument("-i", "--inverted", dest="inverted",    action="store_true",
+        help="Invert the filters and their order")
     # filter_parser.add_argument("--show",                  action="store_true",
     #     help="Enable verbose output")
 
@@ -126,7 +129,7 @@ def main():
         case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)
-        case "test-filter": test_filter(arguments.image_path, arguments.filtered_path, arguments.filter_names, arguments.seed_image_path)
+        case "test-filter": test_filter(arguments.image_path, arguments.filtered_path, arguments.filter_names, arguments.seed_image_path, arguments.inverted)
         case _:             parser.print_help()
 
 

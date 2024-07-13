@@ -1,7 +1,5 @@
 import numpy as np
-from pathlib import Path
 import typing
-import cv2
 
 from transform import max_luminance
 
@@ -122,15 +120,16 @@ def filter_name_to_function(name: str): # callable
             return lambda image: image
 
 
-def filter_image(image_path: Path, filtered_path: Path, fitler_names: list[str], seed_image_path: Path):
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    seed_image = cv2.imread(seed_image_path, cv2.IMREAD_UNCHANGED)
+def apply_filters(image: np.ndarray, seed_image: np.ndarray, fitler_names: list[str], inverted: bool = False):
+    if inverted:
+        fitler_names = ["i" + name for name in reversed(fitler_names)]
     assert all([name in FITLER_NAMES for name in fitler_names])
+    filtered = image.copy()
     for name in fitler_names:
         filter_function = filter_name_to_function(name)
-        image = filter_function(image, seed_image)
+        filtered = filter_function(filtered, seed_image)
         print("applying " + name)
-    cv2.imwrite(filtered_path, image)
+    return filtered
 
 
 def test() -> None:
