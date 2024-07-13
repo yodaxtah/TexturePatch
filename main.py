@@ -58,6 +58,8 @@ def test(original_path: Path, modified_path: Path):
 
 def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], seed_image_path: Path|None, inverted: bool = False):
     seed_image_path_ = seed_image_path if seed_image_path else image_path
+    if not seed_image_path and inverted:
+        print("warning: inverting filters while no seed provided. Are you sure you want to use the first path as seed? Ensure the same seed is used as when the filters were applied.")
     filter_image(image_path, filtered_path, seed_image_path_, fitler_names, inverted)
 
 
