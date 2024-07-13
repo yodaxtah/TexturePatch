@@ -37,7 +37,7 @@ def check_out_path(target_path: Path, callback_dir: Callable[[str, int], None], 
             callback_file(child_path, level+1)
 
 
-def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path) -> None:
+def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = []) -> None:
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
@@ -54,7 +54,7 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
             try:
                 if not image_original_path.exists():
                     raise FileNotFoundError("Original file does not exist")
-                create_patch(image_original_path, image_modified_path, image_patch_path)
+                create_patch(image_original_path, image_modified_path, image_patch_path, filter_names)
             except FileNotFoundError as e:
                 print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
                 print("warning:", str(e))
@@ -66,7 +66,7 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
     check_out_path(modified_path, callback_dir, callback_file)
 
 
-def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None) -> None:
+def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = []) -> None:
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
@@ -81,7 +81,7 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
         print_indented("… " + text, level, end="\r")
         image_pack_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            create_patched(image_original_path, image_patch_path, image_pack_path)
+            create_patched(image_original_path, image_patch_path, image_pack_path, filter_names)
             if modified_path:
                 image_modified_path = modified_path.joinpath(uncommon_path)
                 if (difference := compare_image(image_modified_path, image_pack_path)) == (0, 0):

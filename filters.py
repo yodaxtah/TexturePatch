@@ -45,10 +45,10 @@ def smooth(y, box_pts):
     return y_smooth
 
 
-def create_noise_array(image: np.ndarray, variance: float, axis: int = 0, relative_variance: bool = True, smooth_pixels: int = 1) -> np.ndarray:
+def create_noise_array(image: np.ndarray, seed_image: np.ndarray, variance: float, axis: int = 0, relative_variance: bool = True, smooth_pixels: int = 1) -> np.ndarray:
     assert len(image.shape) >= 2
     assert axis in [0, 1]
-    np.random.seed(seed=extract_seed(image) % max_luminance(np.dtype(np.uint32)))
+    np.random.seed(seed=extract_seed(seed_image) % max_luminance(np.dtype(np.uint32)))
     length, max_variance = image.shape[axis - 0], image.shape[1 - axis]
     variance_ = (variance / 100 * max_variance) if relative_variance else variance
     array = np.random.rand(length) * variance_
@@ -63,7 +63,7 @@ def create_rolled_image(image: np.ndarray, shift: typing.Iterable[int], axis: in
     assert len(image.shape) >= 2
     copy = image.copy()
     length = image.shape[axis]
-    print(shift[:10])
+    # print(shift[:10])
     for i in range(length):
         idx = [slice(None)] * image.ndim
         idx[axis] = i
@@ -90,28 +90,28 @@ def filter_name_to_function(name: str): # callable
     match name:
         case "roll-h":
             def f(image, seed_image):
-                shift = create_noise_array(seed_image, 10, relative_variance=True, smooth_pixels=40)
+                shift = create_noise_array(image, seed_image, 10, relative_variance=True, smooth_pixels=40)
                 shift -= shift.min()
                 filtered = create_rolled_image(image, shift)
                 return filtered
             return f
         case "roll-v":
             def f(image, seed_image):
-                shift = create_noise_array(seed_image, 5, relative_variance=True, smooth_pixels=13, axis=1)
+                shift = create_noise_array(image, seed_image, 5, relative_variance=True, smooth_pixels=13, axis=1)
                 shift -= shift.min()
                 filtered = create_rolled_image(image, shift, axis=1)
                 return filtered
             return f
         case "iroll-h":
             def f(image, seed_image):
-                shift = create_noise_array(seed_image, 10, relative_variance=True, smooth_pixels=40)
+                shift = create_noise_array(image, seed_image, 10, relative_variance=True, smooth_pixels=40)
                 shift -= shift.min()
                 filtered = create_rolled_image(image, -shift)
                 return filtered
             return f
         case "iroll-v":
             def f(image, seed_image):
-                shift = create_noise_array(seed_image, 5, relative_variance=True, smooth_pixels=13, axis=1)
+                shift = create_noise_array(image, seed_image, 5, relative_variance=True, smooth_pixels=13, axis=1)
                 shift -= shift.min()
                 filtered = create_rolled_image(image, -shift, axis=1)
                 return filtered
@@ -128,7 +128,7 @@ def apply_filters(image: np.ndarray, seed_image: np.ndarray, fitler_names: list[
     for name in fitler_names:
         filter_function = filter_name_to_function(name)
         filtered = filter_function(filtered, seed_image)
-        print("applying " + name)
+        # print("applying " + name)
     return filtered
 
 

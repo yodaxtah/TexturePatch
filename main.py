@@ -8,20 +8,20 @@ from pack import create_texture_pack, create_texture_patch_pack
 from filters import FITLER_NAMES
 
 
-def create(original_path: Path, modified_path: Path, patch_path: Path):
+def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str]):
     if original_path.is_file() and modified_path.is_file():
-        create_patch(original_path, modified_path, patch_path)
+        create_patch(original_path, modified_path, patch_path, filter_names)
     elif original_path.is_dir() and modified_path.is_dir():
-        create_texture_patch_pack(original_path, modified_path, patch_path)
+        create_texture_patch_pack(original_path, modified_path, patch_path, filter_names)
     else:
         print("Expected either all directories or all images")
 
 
-def apply(original_path: Path, patch_path: Path, patched_path: Path):
+def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str]):
     if original_path.is_file() and patch_path.is_file():
-        create_patched(original_path, patch_path, patched_path)
+        create_patched(original_path, patch_path, patched_path, filter_names)
     elif original_path.is_dir() and patch_path.is_dir():
-        create_texture_pack(original_path, patch_path, patched_path)
+        create_texture_pack(original_path, patch_path, patched_path, filter_names=filter_names)
     else:
         print("Expected either all directories or all images")
 
@@ -74,6 +74,8 @@ def main():
         help="The path to the modified directory or image")
     create_parser.add_argument(dest="patch_path",                      metavar="patch-path",    type=Path, # "-o", "--output", default=DEFAULT_OUTPUT_PATH,
         help="The path to the directory containing patch images or patch image")
+    create_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
+        help="The names of the filters to apply")
     # --print-from-root
     # -r --max-depth x
 
@@ -84,6 +86,8 @@ def main():
         help="The path to the patch directory or image")
     apply_parser.add_argument(dest="patched_path",                     metavar="patched-path",  type=Path, # "-m", "--output", default=DEFAULT_OUTPUT_PATH,
         help="The path to the directory containing patched images or patched image")
+    apply_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
+        help="The names of the filters to invert")
     # --print-from-root
     # -r --max-depth x
 
@@ -126,8 +130,8 @@ def main():
     arguments = parser.parse_args()
     command = arguments.subparser_name
     match command:
-        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path)
-        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path)
+        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names)
+        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.filter_names)
         case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)

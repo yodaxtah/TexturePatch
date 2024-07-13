@@ -68,7 +68,7 @@ def unpack(packed_image: np.ndarray):
     return image, positive_maps
 
 
-def create_patch(original_path: Path, modified_path: Path, patch_path: Path):
+def create_patch(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = []):
     original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
     modified_image = cv2.imread(modified_path, cv2.IMREAD_UNCHANGED) # for some reason 65535
     resized_image = resized_to_shape(original_image, modified_image.shape)
@@ -87,16 +87,18 @@ def create_patch(original_path: Path, modified_path: Path, patch_path: Path):
     assert shifted.min() >= 0, "image has too small value"
 
     shifted_image: np.ndarray = shifted.astype(modified_image.dtype)
-    patch_image: np.ndarray = pack(shifted_image, [difference_is_positive, hashed_is_positive])
+    packed_image: np.ndarray = pack(shifted_image, [difference_is_positive, hashed_is_positive])
+    patch_image: np.ndarray = apply_filters(packed_image, original_image, filter_names)
     cv2.imwrite(patch_path, patch_image)
 
 
-def create_patched(original_path: Path, patch_path: Path, patched_path: Path):
-    patch_image = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
-    shifted_image, positive_maps = unpack(patch_image)
+def create_patched(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str] = []):
+    original_image: np.ndarray = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
+    patch_image: np.ndarray = cv2.imread(patch_path, cv2.IMREAD_UNCHANGED)
+    packed_image: np.ndarray = apply_filters(patch_image, original_image, filter_names, inverted=True)
+    shifted_image, positive_maps = unpack(packed_image)
     difference_is_positive, hashed_is_positive = positive_maps
-    original_image = cv2.imread(original_path, cv2.IMREAD_UNCHANGED)
-    resized_image = resized_to_shape(original_image, shifted_image.shape)
+    resized_image: np.ndarray = resized_to_shape(original_image, shifted_image.shape)
 
     shifted = shifted_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32)
     hashed = sign_unshifted_image(hashed_is_positive, shifted)
