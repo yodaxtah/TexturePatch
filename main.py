@@ -134,7 +134,7 @@ def main():
         help="The path to the modified directory or image")
     create_parser.add_argument(dest="patch_path",                      metavar="patch-path",    type=Path, # "-o", "--output", default=DEFAULT_OUTPUT_PATH,
         help="The path to the directory containing patch images or patch image")
-    create_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
+    create_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters-names", type=str, nargs="+", choices=FITLER_NAMES, default=[],
         help="The names of the filters to apply")
     create_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
@@ -149,7 +149,7 @@ def main():
         help="The path to the directory containing patched images or patched image")
     apply_parser.add_argument("-v", "--validate", dest="validate_path", metavar="validate-path", type=Path,
         help="Validate the patched path result with another path's content")
-    apply_parser.add_argument("-f", "--filters", dest="filter_names",  metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
+    apply_parser.add_argument("-f", "--filters", dest="filter_names",  metavar="filters-names", type=str, nargs="+", choices=FITLER_NAMES, default=[],
         help="The names of the filters to invert")
     apply_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
