@@ -2,7 +2,7 @@
 
 Many game console emulators allow users to extract and replace textures, while decompiled games also provide opportunities to upscale and clean up their visuals. However, the legal landscape surrounding these texture modifications is complex. Players are generally free to tinker with textures they've extracted from games they own. But sharing those enhanced assets publicly would likely infringe on the original copyright holders' intellectual property rights.
 
-This is where the TexturePatch tool comes into play. TexturePatch is a proof-of-concept tool that enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
+This is where the TexturePatch tool comes into play. It is a proof-of-concept tool that enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
 
 ## Concept
 
@@ -36,15 +36,15 @@ Patch_{naive} = Modified - Original = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-If we'd like to create our own modified image, without ever being obtaining it elsewhere, we can simply calculate it as follows:
+If we'd like to recreate our own modified image, we can simply calculate it as follows:
 
 $$
 Patched_{naive} = Original + Patch_{naive} = Modified
 $$
 
-We've made a few simplifications in this example.
+This way the modified image never has to be published (only the patch), reducing the risk at copyright infringement. We've made a few simplifications in this example though.
 
-1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). In order to create a difference (patch), the sizes should be the same. The only option is to resize the original image to the new dimension using a standard method. The tool uses cubic interpolation, as it produces better results and computation takes _longer_.
+1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). Different dimensions are supported by the tool. In order to create a difference (patch), the eventual sizes must be the same, therefore the original image is resized to the modified image's dimension using a standard method using cubic interpolation.
 1. The difference of two 8-bit images can only be faithfully stored using 9-bit $(0-255, 255-0)$, whereas the patch itself will be an 8 bit image. The tool adds sign descriptors at the bottom of the image and stores the absolute difference.
 
 ## Protecting the original image from reversing
@@ -64,7 +64,7 @@ $$
 Reversed = Modified - Patch_{protected} + Noise(0) \neq Original
 $$
 
-To correctly reverse the image, it is now necessary to have the original image (or just the seed), making the point of reversing the image pointless. The noise will have sufficiently high variance (currently 96) so that the reversed luminances will be too hard to correct, and the texture will be unusable as a texture. Moreover, the size information of the original texture is not added to the patch. This approach has the advantage that no key has to be shared around to share patches, they are extracted from the images individually.
+To correctly reverse the image, it is now necessary to have the original image (or just the seed), making the point of reversing the image pointless. The noise will have sufficiently high variance (currently 96 luminance levels) so that the reversed luminances will be too hard to correct, and the texture will be unusable as a texture. Moreover, the size information of the original texture is not added to the patch. This approach has the advantage that no key has to be shared around to share patches, they are extracted from the images individually.
 
 Again, simplifications are made. Now, the range is no longer 9 bit (to maximally represent $(-256, 255)$), since the noise can overflow it. With $(0,n)$ being the range for the noise, the total patch range would become $(0-255+0, 255-0+n)$. Additional data will have to be stored. The lazy solution was to just add the occassions where the noise was inverted. This will be visible as the other row of mini textures.
 
