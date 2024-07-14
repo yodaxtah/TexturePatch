@@ -27,19 +27,23 @@ def create(original_path: Path, modified_path: Path, patch_path: Path, filter_na
         print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
 
 
-def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str] = [], print_full_path: bool = False):
+def apply(original_path: Path, patch_path: Path, patched_path: Path, valide_path: Path|None, filter_names: list[str] = [], print_full_path: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif not patch_path.exists():
         print(patch_path, "does not exist")
+    elif valide_path and not valide_path.exists():
+        print(valide_path, "does not exist")
     elif original_path == patched_path:
         print(original_path, "will be overwritten because the same path is provided")
     elif patch_path == patched_path:
         print(patch_path, "will be overwritten because the same path is provided")
     elif original_path.is_file() and patch_path.is_file():
+        if valide_path:
+            print("compare not setup for single images yet")
         create_patched(original_path, patch_path, patched_path, filter_names)
     elif original_path.is_dir() and patch_path.is_dir():
-        create_texture_pack(original_path, patch_path, patched_path, filter_names=filter_names, print_full_path=print_full_path)
+        create_texture_pack(original_path, patch_path, patched_path, valide_path, filter_names, print_full_path)
     else:
         print("Expected either all directories or all images")
         print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
@@ -143,6 +147,8 @@ def main():
         help="The path to the patch directory or image")
     apply_parser.add_argument(dest="patched_path",                     metavar="patched-path",  type=Path, # "-m", "--output", default=DEFAULT_OUTPUT_PATH,
         help="The path to the directory containing patched images or patched image")
+    apply_parser.add_argument("-v", "--validate", dest="validate_path", metavar="validate-path", type=Path,
+        help="Validate the patched path result with another path's content")
     apply_parser.add_argument("-f", "--filters", dest="filter_names",  metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
         help="The names of the filters to invert")
     apply_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
@@ -191,7 +197,7 @@ def main():
     command = arguments.subparser_name
     match command:
         case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names, arguments.print_full_path)
-        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.filter_names, arguments.print_full_path)
+        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.validate_path, arguments.filter_names, arguments.print_full_path)
         case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path, arguments.print_full_path)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)
