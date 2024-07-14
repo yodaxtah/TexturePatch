@@ -2,7 +2,7 @@ import argparse
 from pathlib import Path
 
 from patch import create_patch, create_patched, filter_image
-from difference import compare_image, reverse_original
+from difference import compare_image, compare_pack, reverse_original
 from test import test_patch
 from pack import create_texture_pack, create_texture_patch_pack
 from filters import FITLER_NAMES
@@ -46,8 +46,7 @@ def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_name
         print(patch_path,    "is a", "file" if patch_path.is_file() else "",    "directory" if patch_path.is_dir() else "")
 
 
-
-def diff(reference_path: Path, patched_path: Path, difference_path: Path|None):
+def diff(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False):
     if not reference_path.exists():
         print(reference_path, "does not exist")
     elif not patched_path.exists():
@@ -55,8 +54,7 @@ def diff(reference_path: Path, patched_path: Path, difference_path: Path|None):
     elif reference_path.is_file() and patched_path.is_file():
         print(compare_image(reference_path, patched_path, difference_path))
     elif reference_path.is_dir() and patched_path.is_dir():
-        print("Directory comparison not implemented yet")
-        pass
+        compare_pack(reference_path, patched_path, difference_path, print_full_path)
     else:
         print("Expected either all directories or all images")
         print(reference_path, "is a", "file" if reference_path.is_file() else "", "directory" if reference_path.is_dir() else "")
@@ -158,6 +156,8 @@ def main():
         help="The path to the modified directory or image")
     diff_parser.add_argument(dest="difference_path",                   metavar="difference-path", type=Path, nargs="?", default=None,# "-o", "--output",
         help="The path to the directory containing difference images or difference image")
+    diff_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
+        help="Print full paths when processing an image in a directory")
 
     reverse_parser = subparsers.add_parser("reverse", help="Reverse the original image by a patch")
     reverse_parser.add_argument(dest="modified_path",                  metavar="modified-path",   type=Path, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
@@ -192,7 +192,7 @@ def main():
     match command:
         case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names, arguments.print_full_path)
         case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.filter_names, arguments.print_full_path)
-        case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path)
+        case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path, arguments.print_full_path)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)
         case "test-filter": test_filter(arguments.image_path, arguments.filtered_path, arguments.filter_names, arguments.seed_image_path, arguments.inverted)

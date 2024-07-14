@@ -1,9 +1,14 @@
 from transform import signed, multi_linear_transform, resized_to_shape, sign_unshifted_image, max_luminance
 from patch import unpack
+from cli import RESET, RED, GREEN, ORANGE, BLUE, MAGENTA, CYAN, BOLD
+from traverse import check_out_path, print_indented
 
 import cv2
 import numpy as np
 from pathlib import Path
+
+
+SUFFIXES = [".png"] # FIXME: duplicate identifier
 
 
 def scaled_stack(scale: np.ndarray, elements: list[np.ndarray]):
@@ -50,6 +55,41 @@ def compare_image(reference_path: Path, patched_path: Path, difference_path: Pat
         difference_image = create_difference_image(difference)
         cv2.imwrite(difference_path.with_stem(f"{difference_path.stem}-{reference_path.stem}-{patched_path.stem}"), difference_image)
     return int(difference.min()), int(difference.max())
+
+
+def compare_pack(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False) -> None:
+    error_paths = []
+    def callback_dir(path: Path, level: int):
+        text = path.name
+        if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
+            text += f" ({len(images)})" # TODO: /total
+        print_indented(f"{BOLD}{MAGENTA}{text}{RESET}", level)
+    def callback_file(image_reference_path: Path, level: int):
+        if image_reference_path.suffix in SUFFIXES: # and image_reference_path.name == "bch-bench-wood.png":
+            relative_replacements_path = image_reference_path.relative_to(reference_path)
+            image_patched_path = patched_path.joinpath(relative_replacements_path)
+            image_reference_path = reference_path.joinpath(relative_replacements_path)
+            text = (image_reference_path if print_full_path else relative_replacements_path).as_posix()
+            print_indented("… " + text, level, end=(None if reference_path == None else "\r"))
+            try:
+                if not image_patched_path.exists():
+                    raise FileNotFoundError("Patched file does not exist")
+                difference = compare_image(image_reference_path, image_patched_path)
+                text2 = (f"{GREEN}✔{RESET}" if difference == (0, 0) else f"{RED}✖{RESET}") + " " + text + "\t" + f"({BLUE}{difference[0]}{RESET}, {RED}{difference[1]}{RESET})"
+                print_indented(text2, level, end="\n", flush=True) # https://symbolsdb.com/check-mark-symbol
+            except FileNotFoundError as e:
+                print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
+                print("warning:", str(e))
+            except Exception as e:
+                error_paths.append(image_reference_path)
+                print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
+                print("error:", str(e))
+                raise e
+    check_out_path(reference_path, callback_dir, callback_file)
+    if error_paths:
+        print(f"Encountered {len(error_paths)} errors:")
+        for path in error_paths:
+            print("  " + str(path))
 
 
 def reverse_original(modified_path: Path, patch_path: Path, reversed_path: Path) -> None:
