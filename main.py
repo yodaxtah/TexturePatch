@@ -9,58 +9,116 @@ from filters import FITLER_NAMES
 
 
 def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str]):
-    if original_path.is_file() and modified_path.is_file():
+    if not original_path.exists():
+        print(original_path, "does not exist")
+    elif not modified_path.exists():
+        print(modified_path, "does not exist")
+    elif original_path == patch_path:
+        print(original_path, "will be overwritten because the same path is provided")
+    elif modified_path == patch_path:
+        print(modified_path, "will be overwritten because the same path is provided")
+    elif original_path.is_file() and modified_path.is_file():
         create_patch(original_path, modified_path, patch_path, filter_names)
     elif original_path.is_dir() and modified_path.is_dir():
         create_texture_patch_pack(original_path, modified_path, patch_path, filter_names)
     else:
         print("Expected either all directories or all images")
+        print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
+        print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
 
 
 def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str]):
-    if original_path.is_file() and patch_path.is_file():
+    if not original_path.exists():
+        print(original_path, "does not exist")
+    elif not patch_path.exists():
+        print(patch_path, "does not exist")
+    elif original_path == patched_path:
+        print(original_path, "will be overwritten because the same path is provided")
+    elif patch_path == patched_path:
+        print(patch_path, "will be overwritten because the same path is provided")
+    elif original_path.is_file() and patch_path.is_file():
         create_patched(original_path, patch_path, patched_path, filter_names)
     elif original_path.is_dir() and patch_path.is_dir():
         create_texture_pack(original_path, patch_path, patched_path, filter_names=filter_names)
     else:
         print("Expected either all directories or all images")
+        print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
+        print(patch_path,    "is a", "file" if patch_path.is_file() else "",    "directory" if patch_path.is_dir() else "")
+
 
 
 def diff(reference_path: Path, patched_path: Path, difference_path: Path|None):
-    if reference_path.is_file() and patched_path.is_file():
+    if not reference_path.exists():
+        print(reference_path, "does not exist")
+    elif not patched_path.exists():
+        print(patched_path, "does not exist")
+    elif reference_path.is_file() and patched_path.is_file():
         print(compare_image(reference_path, patched_path, difference_path))
     elif reference_path.is_dir() and patched_path.is_dir():
         print("Directory comparison not implemented yet")
         pass
     else:
         print("Expected either all directories or all images")
+        print(reference_path, "is a", "file" if reference_path.is_file() else "", "directory" if reference_path.is_dir() else "")
+        print(patched_path,   "is a", "file" if patched_path.is_file() else "",   "directory" if patched_path.is_dir() else "")
 
 
 def reverse(modified_path: Path, patch_path: Path, reversed_path: Path|None):
-    # TODO: mk parents
-    if modified_path.is_file() and patch_path.is_file():
+    if not modified_path.exists():
+        print(modified_path, "does not exist")
+    elif not patch_path.exists():
+        print(patch_path, "does not exist")
+    elif modified_path == patched_path:
+        print(modified_path, "will be overwritten because the same path is provided")
+    elif patch_path == patched_path:
+        print(patch_path, "will be overwritten because the same path is provided")
+    elif modified_path.is_file() and patch_path.is_file():
         reverse_original(modified_path, patch_path, reversed_path)
     elif modified_path.is_dir() and patch_path.is_dir():
         print("Directory reversing not implemented yet")
         pass
     else:
         print("Expected either all directories or all images")
+        print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
+        print(patch_path,    "is a", "file" if patch_path.is_file() else "",    "directory" if patch_path.is_dir() else "")
 
 
 def test(original_path: Path, modified_path: Path):
-    if original_path.is_file() and modified_path.is_file():
+    if not original_path.exists():
+        print(original_path, "does not exist")
+    elif not modified_path.exists():
+        print(modified_path, "does not exist")
+    elif original_path.is_file() and modified_path.is_file():
         test_patch(original_path, modified_path)
     elif original_path.is_dir() and modified_path.is_dir():
         pass
     else:
         print("Expected either all directories or all images")
+        print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
+        print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
 
 
 def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], seed_image_path: Path|None, inverted: bool = False):
     seed_image_path_ = seed_image_path if seed_image_path else image_path
     if not seed_image_path and inverted:
         print("warning: inverting filters while no seed provided. Are you sure you want to use the first path as seed? Ensure the same seed is used as when the filters were applied.")
-    filter_image(image_path, filtered_path, seed_image_path_, fitler_names, inverted)
+    if not image_path.exists():
+        print(image_path, "does not exist")
+    elif not filtered_path.exists():
+        print(filtered_path, "does not exist")
+    elif not seed_image_path.exists():
+        print(seed_image_path, "does not exist")
+    elif image_path == filtered_path:
+        print(filtered_path, "will be overwritten because the same path is provided")
+    elif image_path.is_file() and filtered_path.is_file():
+        filter_image(image_path, filtered_path, seed_image_path_, fitler_names, inverted)
+    elif image_path.is_dir() and filtered_path.is_dir():
+        print("Directory reversing not implemented yet")
+        pass
+    else:
+        print("Expected either all directories or all images")
+        print(image_path,    "is a", "file" if image_path.is_file() else "",    "directory" if image_path.is_dir() else "")
+        print(filtered_path, "is a", "file" if filtered_path.is_file() else "", "directory" if filtered_path.is_dir() else "")
 
 
 def main():
