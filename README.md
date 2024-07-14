@@ -92,6 +92,12 @@ Running the following command will create a patch texture [crate-brown-wood-patc
 python main.py create ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patch.png
 ```
 
+Filters can be passed, to further obfuscate the patch's shape. Some of them will require the original image as a seed, which will automatically be provided. For patches filtered using the seed, the original images are required to deobfuscate them before applying them. For now, they are omitted in the demo on reversing.
+
+```console
+python main.py create ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patch.png --filters roll-h roll-v roll-v
+```
+
 ### `apply`
 
 Running the following command will apply the patch to the original texture and create [crate-brown-wood-patch.png](./demo/crate-brown-wood-patch.png). This method currently also works recursively on directories.
@@ -100,9 +106,15 @@ Running the following command will apply the patch to the original texture and c
 python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.png ./demo/crate-brown-wood-patched.png
 ```
 
+And just like before, you can pass filters to deobfuscate the patches. The order that these filters get removed is reversed from what is passed through the command line. The filters themselves are inverted.
+
+```console
+python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.png ./demo/crate-brown-wood-patched.png --filters roll-h roll-v roll-v
+```
+
 ### `diff`
 
-A patch creator can ensure their patches will apply well matches exactly by running the following command. It will print `(min, max)`, in the case of the specific command `(0, 0)` since an pixel-wise comparison between the images is always 0.
+A patch creator can ensure their patches will apply well -- matches exactly -- by running the following command. It will print `(min, max)`, in the case of the specific command `(0, 0)` since an pixel-wise comparison between the images is always 0.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png
@@ -147,13 +159,14 @@ python main.py diff    ./demo/crate-brown-wood-reversed.png ./demo/crate-brown-w
 To preview the effectiveness of a filter, one can apply them to a certain image. Some filters require a seed (image) to invert them, which is when `--seed` must be provided for both applying and removing a filter. Providing no seed will use the first image as a seed.
 
 ```console
-python main.py test-filter ./demo/logo-patch.jpg ./demo/logo-patch-filtered.png filter1 filter2 filter3
+python main.py test-filter ./demo/logo-patch.png ./demo/logo-patch-filtered.png filter1 filter2 filter3
 ```
 
-To remove the filters, simply prepend the names with `i` and **reverse the order of the filters**.
+To remove the filters, use the same list and pass `--inverted`. Another way to achieve the same is to prepend the names with `i` and reverse the order of the filters. **Don't forget to pass the same  `--seed ./demo/logo-patch.png`, omitted below!**
 
 ```console
-python main.py test-filter ./demo/logo-filtered.jpg ./demo/logo-patch-inverted.png ifilter3 ifilter2 ifilter1
+python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.png --inverted filter1 filter2 filter3 # automatically convert to second command below
+python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.png ifilter3 ifilter2 ifilter1 # exactly the same
 ```
 
 ## Demo
@@ -204,16 +217,18 @@ We did not bother to additionally write an algorithm with $Noise(0)$ to view wha
 
 ## Roadmap
 
-In its current state, three packs (Dash's, Jak 1 HD UI, JAK 1 ESGRAN) have been created and applied to Windows, and match exactly. With the exception of an assertion going off (as intended) for 12 images in the last pack -- images that have a width larger than the header. It also has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches.
+In its current state, three packs (Dash's, Jak 1 HD UI, JAK 1 ESGRAN) have been created and applied to Windows, and match exactly. With the exception of an assertion going off (as intended) for 12 images in the last pack -- images that have a width larger than the header row. It also has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches.
 
 Given that the concept has been implemented to most extent, there isn 't much left planned. Here are a few things.
 
-- Fix that assertion bug
-- Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
-- Try out new packs (and fix new bugs probably)
-- Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
-- Support directories for `diff`, `test`, `test-filter`
-- Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.
+- [ ] Fix that assertion bug
+- [ ] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
+- [ ] Try out new packs (and fix new bugs probably)
+- [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
+- [ ] Support directories for `diff`, `test`, `test-filter`
+- [x] Support filters in `create`, `apply`
+- [ ] Check if paths exist
+- [ ] Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.
     ```python
     >>> import cv2
     >>> image = cv2.imread("./demo/logo.png", cv2.IMREAD_UNCHANGED) # 1.16 MB
