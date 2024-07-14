@@ -38,10 +38,11 @@ def check_out_path(target_path: Path, callback_dir: Callable[[str, int], None], 
 
 
 def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = []) -> None:
+    error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
-            text += f" ({len(images)})"
+            text += f" ({len(images)})" # TODO: /total
         print_indented(f"{BOLD}{MAGENTA}{text}{RESET}", level)
     def callback_file(image_modified_path: Path, level: int):
         if image_modified_path.suffix in SUFFIXES: # and image_modified_path.name == "bch-bench-wood.png":
@@ -59,14 +60,20 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
                 print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
                 print("warning:", str(e))
             except Exception as e:
+                error_paths.append(image_original_path)
                 print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
                 print("error:", str(e))
             else:
                 print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
     check_out_path(modified_path, callback_dir, callback_file)
+    if error_paths:
+        print(f"Encountered {len(error_paths)} errors:")
+        for path in error_paths:
+            print("  " + str(path))
 
 
 def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = []) -> None:
+    error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
         if images := [p for p in path.iterdir() if p.is_file and p.suffix.lower() in SUFFIXES]:
@@ -74,6 +81,8 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
         print_indented(f"{BOLD}{CYAN}{text}{RESET}", level)
     def callback_file(image_patch_path: Path, level: int):
         # if image_patch_path.suffix in SUFFIXES:
+        # if not image_patch_path.name == "bch-bench-wood.png":
+        #     return
         uncommon_path = image_patch_path.relative_to(patch_path)
         image_pack_path = pack_path.joinpath(uncommon_path)
         image_original_path = original_path.joinpath(uncommon_path)
@@ -95,9 +104,14 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
             print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
             print("assertion error:", str(e))
         except Exception as e:
+            error_paths.append(image_original_path)
             print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
             print("error:", str(e))
     check_out_path(patch_path, callback_dir, callback_file)
+    if error_paths:
+        print(f"Encountered {len(error_paths)} errors:")
+        for path in error_paths:
+            print("  " + str(path))
 
 
 if __name__ == "__main__":

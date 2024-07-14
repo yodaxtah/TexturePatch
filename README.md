@@ -68,7 +68,7 @@ To correctly reverse the image, it is now necessary to have the original image (
 
 Again, simplifications are made. Now, the range is no longer 9 bit (to maximally represent $(-256, 255)$), since the noise can overflow it. With $(0,n)$ being the range for the noise, the total patch range would become $(0-255+0, 255-0+n)$. Additional data will have to be stored. The lazy solution was to just add the occassions where the noise was inverted. This will be visible as the other row of mini textures.
 
-## Protecting the visible shapes
+## Protecting visible shapes in patches
 
 Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e. "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is the somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
 <!-- These small differences tend to give away the edges present in a texture -- the overal shape. This is currently a consideration to make when using the tool. On the other hand, the colors can't be reversed, nor the size of the orignal image. Someone that does not have access to the original textures is time-wise better of obtaining them somewhere online illegally, than doing manual cleaning of the edges. (Attempts are welcome to see the effectiveness!) -->
