@@ -8,7 +8,7 @@ from pack import create_texture_pack, create_texture_patch_pack
 from filters import FITLER_NAMES
 
 
-def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str]):
+def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif not modified_path.exists():
@@ -20,14 +20,14 @@ def create(original_path: Path, modified_path: Path, patch_path: Path, filter_na
     elif original_path.is_file() and modified_path.is_file():
         create_patch(original_path, modified_path, patch_path, filter_names)
     elif original_path.is_dir() and modified_path.is_dir():
-        create_texture_patch_pack(original_path, modified_path, patch_path, filter_names)
+        create_texture_patch_pack(original_path, modified_path, patch_path, filter_names, print_full_path)
     else:
         print("Expected either all directories or all images")
         print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
         print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
 
 
-def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str]):
+def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_names: list[str] = [], print_full_path: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif not patch_path.exists():
@@ -39,7 +39,7 @@ def apply(original_path: Path, patch_path: Path, patched_path: Path, filter_name
     elif original_path.is_file() and patch_path.is_file():
         create_patched(original_path, patch_path, patched_path, filter_names)
     elif original_path.is_dir() and patch_path.is_dir():
-        create_texture_pack(original_path, patch_path, patched_path, filter_names=filter_names)
+        create_texture_pack(original_path, patch_path, patched_path, filter_names=filter_names, print_full_path=print_full_path)
     else:
         print("Expected either all directories or all images")
         print(original_path, "is a", "file" if original_path.is_file() else "", "directory" if original_path.is_dir() else "")
@@ -134,7 +134,8 @@ def main():
         help="The path to the directory containing patch images or patch image")
     create_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
         help="The names of the filters to apply")
-    # --print-from-root
+    create_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
+        help="Print full paths when processing an image in a directory")
     # -r --max-depth x
 
     apply_parser = subparsers.add_parser("apply", help="Apply a patch")
@@ -144,9 +145,10 @@ def main():
         help="The path to the patch directory or image")
     apply_parser.add_argument(dest="patched_path",                     metavar="patched-path",  type=Path, # "-m", "--output", default=DEFAULT_OUTPUT_PATH,
         help="The path to the directory containing patched images or patched image")
-    apply_parser.add_argument("-f", "--filters", dest="filter_names", metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
+    apply_parser.add_argument("-f", "--filters", dest="filter_names",  metavar="filters",       type=str, nargs="+", choices=FITLER_NAMES, default=[],
         help="The names of the filters to invert")
-    # --print-from-root
+    apply_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
+        help="Print full paths when processing an image in a directory")
     # -r --max-depth x
 
     diff_parser = subparsers.add_parser("diff", help="Compare a reference image with a modified one")
@@ -188,8 +190,8 @@ def main():
     arguments = parser.parse_args()
     command = arguments.subparser_name
     match command:
-        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names)
-        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.filter_names)
+        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names, arguments.print_full_path)
+        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.filter_names, arguments.print_full_path)
         case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)

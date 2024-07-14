@@ -29,7 +29,7 @@ def check_out_path(target_path: Path, callback_dir: Callable[[str, int], None], 
             callback_file(child_path, level+1)
 
 
-def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = []) -> None:
+def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -38,10 +38,10 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
         print_indented(f"{BOLD}{MAGENTA}{text}{RESET}", level)
     def callback_file(image_modified_path: Path, level: int):
         if image_modified_path.suffix in SUFFIXES: # and image_modified_path.name == "bch-bench-wood.png":
-            uncommon_path = image_modified_path.relative_to(modified_path)
-            image_patch_path = patch_path.joinpath(uncommon_path)
-            image_original_path = original_path.joinpath(uncommon_path)
-            text = image_original_path.as_posix()
+            relative_replacements_path = image_modified_path.relative_to(modified_path)
+            image_patch_path = patch_path.joinpath(relative_replacements_path)
+            image_original_path = original_path.joinpath(relative_replacements_path)
+            text = (image_original_path if print_full_path else relative_replacements_path).as_posix()
             print_indented("… " + text, level, end=(None if modified_path == None else "\r"))
             image_patch_path.parent.mkdir(parents=True, exist_ok=True)
             try:
@@ -64,7 +64,7 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
             print("  " + str(path))
 
 
-def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = []) -> None:
+def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = [], print_full_path: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -72,19 +72,16 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
             text += f" ({len(images)})"
         print_indented(f"{BOLD}{CYAN}{text}{RESET}", level)
     def callback_file(image_patch_path: Path, level: int):
-        # if image_patch_path.suffix in SUFFIXES:
-        # if not image_patch_path.name == "bch-bench-wood.png":
-        #     return
-        uncommon_path = image_patch_path.relative_to(patch_path)
-        image_pack_path = pack_path.joinpath(uncommon_path)
-        image_original_path = original_path.joinpath(uncommon_path)
-        text = image_pack_path.as_posix()
+        relative_replacements_path = image_patch_path.relative_to(patch_path)
+        image_pack_path = pack_path.joinpath(relative_replacements_path)
+        image_original_path = original_path.joinpath(relative_replacements_path)
+        text = (image_pack_path if print_full_path else relative_replacements_path).as_posix()
         print_indented("… " + text, level, end="\r")
         image_pack_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             create_patched(image_original_path, image_patch_path, image_pack_path, filter_names)
             if modified_path:
-                image_modified_path = modified_path.joinpath(uncommon_path)
+                image_modified_path = modified_path.joinpath(relative_replacements_path)
                 if (difference := compare_image(image_modified_path, image_pack_path)) == (0, 0):
                     print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
                 else:
