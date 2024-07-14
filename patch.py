@@ -23,7 +23,6 @@ def pack(image: np.ndarray, positive_maps: list[np.ndarray]):
             else:
                 raise RuntimeError("Unexpected size")
     row_size = np.prod(image.shape[1:])
-    assert packed_map.size > row_size, "map is smaller than row"
     packed_number_of_zeros_size = footer_type.itemsize // pixel_type.itemsize
     is_padded_size = pixel_type.itemsize // pixel_type.itemsize
     number_of_zeros = remainder_modulo(packed.size + packed_number_of_zeros_size + is_padded_size + packed_shape.size, row_size)
