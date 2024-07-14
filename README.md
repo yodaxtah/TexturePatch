@@ -217,17 +217,27 @@ We did not bother to additionally write an algorithm with $Noise(0)$ to view wha
 
 ## Roadmap
 
-In its current state, three packs (Dash's, Jak 1 HD UI, JAK 1 ESGRAN) have been created and applied to Windows, and match exactly. With the exception of an assertion going off (as intended) for 12 images in the last pack -- images that have a width larger than the header row. It also has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches.
+In its current state, three packs have been created and applied successfully to textures on Windows. (These did not use filters.)
 
-Given that the concept has been implemented to most extent, there isn 't much left planned. Here are a few things.
+- Mysterious Dash HD Textures
+- Jak1 HD UI textures
+- Jak1 ESRGAN Edition v1.0.1
+- Snowover_Release_v0.1.4
+- Mountain_Ash_Release_v0.1.4
+- Meaty_Swamp_Release_v0.1.4
+- JAK2_hd_hud
+- Jak2-HD-Textures-For-OpenGOAL-main
 
-- [ ] Fix that assertion bug
+The tool has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches. Given that the concept has been implemented to most extent and is practically useful, there isn 't much left planned. Here are a few things.
+
+- [x] Fix an outdated assertion that fails when the header row is bigger than the image size.
 - [ ] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
-- [ ] Try out new packs (and fix new bugs probably)
+- [ ] Try out more packs (and fix new bugs maybe)
 - [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
-- [ ] Support directories for `diff`, `test`, `test-filter`
+- [ ] Support directories for ~~`diff`~~, `test`, `test-filter`
 - [x] Support filters in `create`, `apply`
-- [ ] Check if paths exist
+- [ ] Check if paths exist, compare paths, `--overwrite`
+- [ ] Read options from a settings file in the current directory if exists.
 - [ ] Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.
     ```python
     >>> import cv2
