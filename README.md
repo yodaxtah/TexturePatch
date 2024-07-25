@@ -4,9 +4,12 @@ Many game console emulators allow users to extract and replace textures, while d
 
 This is where the TexturePatch tool comes into play. It is a proof-of-concept tool that enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
 
+> [!WARNING]
+> While TexturePatch has progressed beyond a proof-of-conept tool in its technical area, it still requires critical review by other people on its methods. Currently, we _cannot_ guarantee patches are a safe format to be uploaded and whether it would be legal. We can only say that it is _very likely_ safe and _probably_ legal, especially if this method is compared to simply uploading modified versions of original textures as they are.
+
 ## Concept
 
-The idea of this tool is to share the updating values, not the original or final values of an image. Let's say a gray-scale image looks like this, where $0$ represents black and $10$ represents white:
+The idea of this tool is to share the updating values, never the original or final values of an image. Let's say a gray-scale image looks like this, where $0$ represents black and $10$ represents white:
 
 $$
 Original = \begin{bmatrix}
@@ -44,7 +47,7 @@ $$
 
 This way the modified image never has to be published (only the patch), reducing the risk at copyright infringement. We've made a few simplifications in this example though.
 
-1. Image dimensions may vary (i.e. $25\times25$ for the original and $300\times300$ for the modified one). Different dimensions are supported by the tool. In order to create a difference (patch), the eventual sizes must be the same, therefore the original image is resized to the modified image's dimension using a standard method using cubic interpolation.
+1. Image dimensions may vary (i.e., $25\times25$ for the original and $300\times300$ for the modified one). Different dimensions are supported by the tool. In order to create a difference (patch), the eventual sizes must be the same, therefore the original image is resized to the modified image's dimension using a standard method (cubic interpolation).
 1. The difference of two 8-bit images can only be faithfully stored using 9-bit $(0-255, 255-0)$, whereas the patch itself will be an 8 bit image. The tool adds sign descriptors at the bottom of the image and stores the absolute difference.
 
 ## Protecting the original image from reversing
@@ -70,13 +73,13 @@ Again, simplifications are made. Now, the range is no longer 9 bit (to maximally
 
 ## Protecting visible shapes in patches
 
-Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e. "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is the somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
+Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e., "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is the somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
 <!-- These small differences tend to give away the edges present in a texture -- the overal shape. This is currently a consideration to make when using the tool. On the other hand, the colors can't be reversed, nor the size of the orignal image. Someone that does not have access to the original textures is time-wise better of obtaining them somewhere online illegally, than doing manual cleaning of the edges. (Attempts are welcome to see the effectiveness!) -->
 
 
 More importantly, the differences between the original and modified image are the largest when there is a lot of local correction. These are often sharp edges of a logo, or drawn objects. These sharp images appear among texture packs more often than you'd expect. With photoshop tools, these edges can probably be extracted and used to repaint a new texture. Hence, the need arises to further obscure the visual space. On one hand, it is nice to recognize the images, especially for debugging, but on the other hand, it shouldn't be too easy to photoshop it.
 
-Simple pattern swaps (i.e. rotating pixels on black tiles of the chess board) that don't require a seed will already make it hard for most people to do something practical with the patch or a reversed image, but these patterns are also easy to revert with scripting knowledge, since the algorithm can be inspected. (It definitelly won't help that we provide a filtering and filter-reversing tools ourselves!) Patterns can also incorporate noise to determine swap and/or shift positions, which is what we will end up doing.
+Simple pattern swaps (i.e., rotating pixels on black tiles of the chess board) that don't require a seed will already make it hard for most people to do something practical with the patch or a reversed image, but these patterns are also easy to revert with scripting knowledge, since the algorithm can be inspected. (It definitelly won't help that we provide a filtering and filter-reversing tools ourselves!) Patterns can also incorporate noise to determine swap and/or shift positions, which is what we will end up doing.
 
 ## Usage
 
@@ -114,13 +117,13 @@ python main.py apply ./demo/crate-brown-wood.jpg ./demo/crate-brown-wood-patch.p
 
 ### `diff`
 
-A patch creator can ensure their patches will apply well -- matches exactly -- by running the following command. It will print `(min, max)`, in the case of the specific command `(0, 0)` since an pixel-wise comparison between the images is always 0.
+A patch creator can ensure their patches will apply well -- matches exactly -- by running the following command, which supports directories. For two images, it will print the difference values `(min, max)`, which in the case of the specific command below will print `(0, 0)` since an pixel-wise comparison between the exact same images is always 0.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png
 ```
 
-Adding a third path will always generate a difference image, in which completely white represents no change, blue represents luminance decrease and red represents luminance increase. Since this is a view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image [crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). The naming behavior will change in the future.
+Adding a third path will always generate a difference image, in which completely white represents no change, blue represents luminance decrease and red represents luminance increase. Since this is a one dimensional view on 3 channels, all channels (R, G, B) had been added up for comparison. The following command will additionally create a difference image [crate-brown-wood-patch-{firstname}-{secondname}.png](./demo/crate-brown-wood-difference-modified-patched-crate-brown-wood-modified-crate-brown-wood-patched.png). This auto-naming behavior will change in the future.
 
 ```console
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png ./demo/crate-brown-wood-difference-modified-patched.png
@@ -217,7 +220,7 @@ We did not bother to additionally write an algorithm with $Noise(0)$ to view wha
 
 ## Roadmap
 
-In its current state, three packs have been created and applied successfully to textures on Windows. (These did not use filters.)
+In its current state, three packs have been created and applied successfully to textures on Windows, of which the last was cross-platform tested with Linux. (None of these tests included filters.)
 
 - Mysterious Dash HD Textures
 - Jak1 HD UI textures
@@ -228,17 +231,22 @@ In its current state, three packs have been created and applied successfully to 
 - JAK2_hd_hud
 - Jak2-HD-Textures-For-OpenGOAL-main
 
+So far, the created patches don't seem to have issues when crossing platforms. For the last pack, one patch was created using Windows and was succesfully applied using Linux; another patch was created using Linux and succesfully applied using Windows. (There is an exception that caught on patching on Linux that may have slipped on Windows as well on images in Jak and Daxter's `gamefont` folder.
+
 The tool has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches. Given that the concept has been implemented to most extent and is practically useful, there isn 't much left planned. Here are a few things.
 
 - [x] Fix an outdated assertion that fails when the header row is bigger than the image size.
-- [ ] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
+- [x] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
 - [ ] Try out more packs (and fix new bugs maybe)
 - [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
-- [ ] Support directories for ~~`diff`~~, `test`, `test-filter`
+- [x] Support directories for `diff`
+- [ ] ~~Support directories for `test`, `test-filter`~~
 - [x] Support filters in `create`, `apply`
-- [ ] Check if paths exist, compare paths, `--overwrite`
-- [ ] Read options from a settings file in the current directory if exists.
-- [ ] Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.
+- [x] Check if paths exist instead of crashing
+- [x] Prevent duplicate path arguments where it's probably unintended
+- [ ] Add an option to `--overwrite` and do not overwrite by default
+- [ ] Read options from a json settings file in the current directory if exists.
+- [ ] Allow for the definition of a generic `process` command, so people can decide themselves what to do (i.e., additionally run a certain compression tool). Also provide some common examples to process the files. ~~Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.~~
     ```python
     >>> import cv2
     >>> image = cv2.imread("./demo/logo.png", cv2.IMREAD_UNCHANGED) # 1.16 MB
@@ -249,8 +257,8 @@ The tool has a minimal CLI that allows recursively creating patches for all PNGs
 ## Q & A
 
 1. _Can't someone publish these keys and a modification of a reversing algorithm to extract the original images that requires just the patch and the modified textures?_ Sure, but in any case, they can just as well upload the original or modified textures, which is much less of a hassle.
-1. _Are 16-bit png images are supported?_ Yes, but no. The patching works, but it is not yet meant to be used. The original image has to be scaled (**which is currently not the case!**), otherwise, there will be very little difference visible (0-255) compared to (0-65535), and the patch can be just downsampled, creating a very good attempt at reversing the original.
-1. _Are jpgs supported?_ JPGs are a lossy format (that I personally wouldn't expect for games), thus to create a patch for them that results in the exact same jpg is unlikely. The tool creates a png patch, but upon storing the eventual patched image as jpg, some of the data gets lost. This would/should be the case as well when reading and directly writing the image -- yet to be tried. These differences are hardly visible to the eye.
+1. _Are 16-bit png images supported?_ Yes, but no. The patching works, but it is not yet meant to be used. The original image has to be scaled (**which is currently not the case!**), otherwise, there will be very little difference visible (0-255) compared to (0-65535), and the patch can be just downsampled, creating a very good attempt at reversing the original.
+1. _Are jpgs images supported?_ JPGs are a lossy format (that I personally wouldn't expect for games), thus to create a patch for them that results in the exact same jpg is unlikely. The tool creates a png patch, but upon storing the eventual patched image as jpg, some of the data gets lost. This would/should be the case as well when reading and directly writing the image -- yet to be tried. These differences are hardly visible to the eye.
 1. _What are these iccp warnings?_ I'm not sure exactly ([some corruption of the modified image](https://stackoverflow.com/questions/22745076/libpng-warning-iccp-known-incorrect-srgb-profile)), but the goal is to exactly recreate the image. If the modified image is corrupted before patched, then the eventual patched image will have it too.
 1. _Is this method safe?_ For now, I'd say yes. However, I strongly suspect this hashing is not quantum computing safe, as most contemporary encryption algorithms. Since "only" $2^{32}-1$ keys exist, so for each image, one could just try them all at once with a quantum computer and determine which match the best with the modified image using an algorithm. But then again, it takes quite a lot of effort. This should only be a concern for the game company that 1) may want to publish patches (which is unlikely, because why not provide an update to do so instead), or 2) allows artists to publish patches on publically unavailable textures (but that in itself is already extremely unlikely). All the other people that have the goal of finding the original textures waste much less time searching for them online, sadly.
 1. _Can't the shapes of patches be used to recreate a texture_ I don't know, but let's say no. I have almost no photoshop skills. The craziest I could think of are people aligning screenshots of gameplay with shapes in patches, in which way they would have a name and eventually a texture they can modify or use as-is, but as usual, what would be the point. In case the textures hadn't been published before, they would presumably have to spend a lot of time figuring out which texture it is. I welcome anyone to attempts these extreme scenario's.
