@@ -74,7 +74,7 @@ def create_patch(original_path: Path, modified_path: Path, patch_path: Path, fil
 
     resized: np.ndarray = resized_image.astype(np.int16 if modified_image.dtype == np.uint8 else np.int32) # FIXME
     modified: np.ndarray = modified_image.astype(np.int16 if modified_image.dtype == np.uint8 else np.int32) # FIXME
-    noise: np.ndarray = create_noise_image(resized, NOISE_VARIANCE)
+    noise: np.ndarray = create_noise_image(resized, NOISE_VARIANCE).astype(np.int16 if modified_image.dtype == np.uint8 else np.int32) # FIXME
     difference: np.ndarray = modified - resized
     difference_is_positive: np.ndarray = difference >= 0
 
@@ -99,11 +99,11 @@ def create_patched(original_path: Path, patch_path: Path, patched_path: Path, fi
     difference_is_positive, hashed_is_positive = positive_maps
     resized_image: np.ndarray = resized_to_shape(original_image, shifted_image.shape)
 
-    shifted = shifted_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32)
+    shifted = shifted_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
     hashed = sign_unshifted_image(hashed_is_positive, shifted)
 
-    resized: np.ndarray = resized_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32)
-    noise: np.ndarray = create_noise_image(resized, NOISE_VARIANCE)
+    resized: np.ndarray = resized_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
+    noise: np.ndarray = create_noise_image(resized, NOISE_VARIANCE).astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
     difference = hashed + signed(difference_is_positive, noise)
     patched: np.ndarray = difference + resized
 

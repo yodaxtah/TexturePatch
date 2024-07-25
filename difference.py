@@ -98,12 +98,12 @@ def reverse_original(modified_path: Path, patch_path: Path, reversed_path: Path)
     shifted_image, positive_maps = unpack(patch_image)
     difference_is_positive, hashed_is_positive = positive_maps
 
-    shifted = shifted_image.astype(np.int16)
+    shifted = shifted_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
     hashed = sign_unshifted_image(hashed_is_positive, shifted)
     
-    noise: np.ndarray = np.zeros(hashed.shape) # create_noise_image(resized, 0)
+    noise: np.ndarray = np.zeros(hashed.shape).astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
     difference = hashed + signed(difference_is_positive, noise)
-    modified: np.ndarray = modified_image.astype(np.int16)
+    modified: np.ndarray = modified_image.astype(np.int16 if shifted_image.dtype == np.uint8 else np.int32) # FIXME
     resized = modified - difference
     reversed_image: np.ndarray = resized.astype(np.uint8)
     cv2.imwrite(reversed_path, reversed_image)
