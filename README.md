@@ -172,6 +172,55 @@ python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.p
 python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.png ifilter3 ifilter2 ifilter1 # exactly the same
 ```
 
+### `process`
+
+Finally, one can execute an arbitrary command on the images, as an optional post-processing step. This may be useful to automatically upscaler/enhance each image in a certain directory given input (`[:original:]`) and output (`[:processed:]`) placeholders. The command below will pass the images in `./textures` one by one as `[:original:]` to `cp` and its resulting images will be stored at `./textures-copy` one by one as `[:processed:]`.
+
+```console
+python main.py process "cp [:original:] [:processed:]" ./textures ./textures-copied # on a directory
+```
+
+One individual texture can be processed either, but it has no point really, as it can be written directly in the terminal without placeholders.
+
+```console
+python main.py process "cp [:original:] [:processed:]" ./textures/foo.png ./textures/foo-copy.png # on a file
+cp ./textures/foo.png ./textures/foo-copy.png # the same
+```
+
+The default placeholders can be overriden, if that is necessary, using `--placeholder-input`, and `--placholder-output`. Make sure the custom placeholders won't occur elsewhere in the template, because _all_ occurrences will be filled in!
+
+```console
+# example placeholders
+python main.py process "cp iiii ((o))" ./textures/foo.png ./textures/foo-copy.png --input-placeholder iiii --output-placeholder "((o))"
+cp ./textures/foo.png ./textures/foo-copy.png # the same
+
+# BAD placeholder(s)
+python main.py process "cp o p" ./textures/foo.png ./textures/foo-copy.png --input-placeholder "o" --output-placeholder "c"
+c./textures/foo-copy.png ./textures/foo.png ./textures/foo-copy.png # the same
+```
+
+This also useful for end users that wish to further compress the images without dataloss, given that [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png). Below, we demonstrate that an image loaded and written unmodified gets a larger file size.
+
+```python
+>>> import cv2
+>>> image = cv2.imread("./demo/logo.png", cv2.IMREAD_UNCHANGED) # 1.16 MB
+>>> cv2.imwrite("./demo/logo-written.png", image) # suddenly 1.31 MB
+True
+```
+
+Several compression tools exist for lossless (or lossy) compression, some even have python wrapped libraries. Some tools have a higher compression ratio at the expense of time, some prioritize time more. However, some players might not even want to waste this additional time on files that will look the same anyway. For this reason, we leave it up to the player to decide what additional tools should be run on the images. Below are a few tools, in no particular order, some of which are lossy.
+
+- [pngcrush](https://pmt.sourceforge.io/pngcrush/)
+- [pngcrunch](https://github.com/the-real-neil/pngcrunch/)
+- [optipng](https://optipng.sourceforge.net/)
+- [kenutils](https://www.jonof.id.au/kenutils.html)
+- [crunch](https://github.com/chrissimpkins/Crunch)
+- [zopfli](https://github.com/google/zopfli)
+- [fpng](https://github.com/richgel999/fpng)
+- [pngquant](https://github.com/kornelski/pngquant)
+
+For those wondering, as of now, you can't run the tool's `create` or `apply` using `process`, as it works on a predefined number (2) on paths, and those commands require three paths.
+
 ## Demo
 
 To demonstrate the results, we'll show two images that are patched and lastly demonstrate filters for further obfuscation.
@@ -246,13 +295,7 @@ The tool has a minimal CLI that allows recursively creating patches for all PNGs
 - [x] Prevent duplicate path arguments where it's probably unintended
 - [ ] Add an option to `--overwrite` and do not overwrite by default
 - [ ] Read options from a json settings file in the current directory if exists.
-- [ ] Allow for the definition of a generic `process` command, so people can decide themselves what to do (i.e., additionally run a certain compression tool). Also provide some common examples to process the files. ~~Try another library for writing images, since [Open CV appears to increase the size of the image](https://stackoverflow.com/questions/12216333/opencv-imread-imwrite-increases-the-size-of-png), even though the luminances are _exactly the same_.~~
-    ```python
-    >>> import cv2
-    >>> image = cv2.imread("./demo/logo.png", cv2.IMREAD_UNCHANGED) # 1.16 MB
-    >>> cv2.imwrite("./demo/logo-written.png", image) # suddenly 1.31 MB
-    True
-    ```
+- [x] Allow for the definition of a generic `process` command, so people can decide themselves what to do additionally (e.g., run a certain compression tool).
 
 ## Q & A
 
