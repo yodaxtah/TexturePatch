@@ -6,6 +6,7 @@ from difference import compare_image, compare_pack, reverse_original
 from test import test_patch
 from pack import create_texture_pack, create_texture_patch_pack
 from filters import FITLER_NAMES
+from postprocess import run_command, create_texture_processed_pack
 
 
 def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False):
@@ -123,6 +124,21 @@ def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], 
         print(filtered_path, "is a", "file" if filtered_path.is_file() else "", "directory" if filtered_path.is_dir() else "")
 
 
+def process(command_template: str, original_path: Path, processed_path: Path, original_placeholder: str, processed_placeholder: str, print_full_path: bool = False):
+    if not original_path.exists():
+        print(original_path, "does not exist")
+    elif original_placeholder not in command_template:
+        print(f"template {repr(command_template)} is missing input placeholder {repr(original_placeholder)}")
+    elif processed_placeholder not in command_template:
+        print(f"template {repr(command_template)} is missing output placeholder {repr(processed_placeholder)}")
+    elif original_path.is_file():
+        run_command(command_template, original_path, processed_path, original_placeholder, processed_placeholder)
+    elif original_path.is_dir():
+        create_texture_processed_pack(command_template, original_path, processed_path, original_placeholder, processed_placeholder, print_full_path)
+    else:
+        print("Hm, this is impossible")
+
+
 def main():
     parser = argparse.ArgumentParser(prog="TexturePatch", description="Tool to create patches from the original image to the modified image")
     subparsers = parser.add_subparsers(dest="subparser_name", help="sub-command help")
@@ -193,6 +209,21 @@ def main():
     # filter_parser.add_argument("--show",                  action="store_true",
     #     help="Enable verbose output")
 
+    process_parser = subparsers.add_parser("process", help="Process a generic command on an image or directory")
+    process_parser.add_argument(dest="command_template",                            metavar="command-template", type=str, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
+        help="The command to execute containing placeholder-input and placeholder-output")
+    process_parser.add_argument(dest="image_path",                                  metavar="image-path",       type=Path, # "-i", "--input", default=".",
+        help="The path to the directory of images or image")
+    process_parser.add_argument(dest="processed_path",                              metavar="processed-path",   type=Path, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
+        help="The path to the processed directory or image")
+    process_parser.add_argument("--input-placeholder", dest="original_placeholder", metavar="original",  type=str, default="[:original:]",
+        help="Use a different place holder in the command template for the image's input path")
+    process_parser.add_argument("--output-placeholder", dest="processed_placeholder", metavar="processed", type=str, default="[:processed:]",
+        help="Use a different place holder in the command template for the processed image's output path")
+    process_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
+        help="Print full paths when processing an image in a directory")
+    
+
     arguments = parser.parse_args()
     command = arguments.subparser_name
     match command:
@@ -202,6 +233,7 @@ def main():
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)
         case "test-filter": test_filter(arguments.image_path, arguments.filtered_path, arguments.filter_names, arguments.seed_image_path, arguments.inverted)
+        case "process":     process(arguments.command_template, arguments.image_path, arguments.processed_path, arguments.original_placeholder, arguments.processed_placeholder, arguments.print_full_path)
         case _:             parser.print_help()
 
 
