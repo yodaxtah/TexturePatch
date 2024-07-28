@@ -28,7 +28,7 @@ def run_command(command_template: str, image_original_path: Path, image_processe
         raise e
 
 
-def create_texture_processed_pack(command_template: str, original_path: Path, processed_path: Path, original_placeholder: str = DEFAULT_ORIGINAL_PLACEHOLDER, processed_placeholder: str = DEFAULT_PROCESSED_PLACEHOLDER, print_full_path: bool = False) -> None:
+def create_texture_processed_pack(command_template: str, original_path: Path, processed_path: Path, original_placeholder: str = DEFAULT_ORIGINAL_PLACEHOLDER, processed_placeholder: str = DEFAULT_PROCESSED_PLACEHOLDER, print_full_path: bool = False, overwrite: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -43,7 +43,14 @@ def create_texture_processed_pack(command_template: str, original_path: Path, pr
             print_indented("… " + text, level, end=(None if processed_path == None else "\r"))
             image_processed_path.parent.mkdir(parents=True, exist_ok=True)
             try:
+                if not overwrite and image_processed_path.exists():
+                    raise FileExistsError("Not allowed to overwrite")
                 run_command(command_template, image_original_path, image_processed_path, original_placeholder, processed_placeholder)
+            except FileExistsError as e:
+                print_indented(f"{GREEN}✖{RESET} {text} SKIPPED: {e}", level, end="\n", flush=True)
+            # except FileExistsError as e:
+            #     print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
+            #     print("warning:", str(e))
             except Exception as e:
                 error_paths.append(image_original_path)
                 print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)

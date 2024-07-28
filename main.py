@@ -9,7 +9,7 @@ from filters import FITLER_NAMES
 from postprocess import run_command, create_texture_processed_pack
 
 
-def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False):
+def create(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False, overwrite: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif not modified_path.exists():
@@ -19,7 +19,10 @@ def create(original_path: Path, modified_path: Path, patch_path: Path, filter_na
     elif modified_path == patch_path:
         print(modified_path, "will be overwritten because the same path is provided")
     elif original_path.is_file() and modified_path.is_file():
-        create_patch(original_path, modified_path, patch_path, filter_names)
+        if patch_path.exists() and not overwrite:
+            print("Not allowed to overwrite patch image, pass --overwrite")
+        else:
+            create_patch(original_path, modified_path, patch_path, filter_names)
     elif original_path.is_dir() and modified_path.is_dir():
         create_texture_patch_pack(original_path, modified_path, patch_path, filter_names, print_full_path)
     else:
@@ -28,7 +31,7 @@ def create(original_path: Path, modified_path: Path, patch_path: Path, filter_na
         print(modified_path, "is a", "file" if modified_path.is_file() else "", "directory" if modified_path.is_dir() else "")
 
 
-def apply(original_path: Path, patch_path: Path, patched_path: Path, valide_path: Path|None, filter_names: list[str] = [], print_full_path: bool = False):
+def apply(original_path: Path, patch_path: Path, patched_path: Path, valide_path: Path|None, filter_names: list[str] = [], print_full_path: bool = False, overwrite: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif not patch_path.exists():
@@ -42,7 +45,10 @@ def apply(original_path: Path, patch_path: Path, patched_path: Path, valide_path
     elif original_path.is_file() and patch_path.is_file():
         if valide_path:
             print("compare not setup for single images yet")
-        create_patched(original_path, patch_path, patched_path, filter_names)
+        elif patched_path.exists() and not overwrite:
+            print("Not allowed to overwrite patched image, pass --overwrite")
+        else:
+            create_patched(original_path, patch_path, patched_path, filter_names)
     elif original_path.is_dir() and patch_path.is_dir():
         create_texture_pack(original_path, patch_path, patched_path, valide_path, filter_names, print_full_path)
     else:
@@ -51,13 +57,16 @@ def apply(original_path: Path, patch_path: Path, patched_path: Path, valide_path
         print(patch_path,    "is a", "file" if patch_path.is_file() else "",    "directory" if patch_path.is_dir() else "")
 
 
-def diff(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False):
+def diff(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False, overwrite: bool = False):
     if not reference_path.exists():
         print(reference_path, "does not exist")
     elif not patched_path.exists():
         print(patched_path, "does not exist")
     elif reference_path.is_file() and patched_path.is_file():
-        print(compare_image(reference_path, patched_path, difference_path))
+        if difference_path and difference_path.exists() and not overwrite:
+            print("Not allowed to overwrite difference image, pass --overwrite")
+        else:
+            print(compare_image(reference_path, patched_path, difference_path))
     elif reference_path.is_dir() and patched_path.is_dir():
         compare_pack(reference_path, patched_path, difference_path, print_full_path)
     else:
@@ -124,7 +133,7 @@ def test_filter(image_path: Path, filtered_path: Path, fitler_names: list[str], 
         print(filtered_path, "is a", "file" if filtered_path.is_file() else "", "directory" if filtered_path.is_dir() else "")
 
 
-def process(command_template: str, original_path: Path, processed_path: Path, original_placeholder: str, processed_placeholder: str, print_full_path: bool = False):
+def process(command_template: str, original_path: Path, processed_path: Path, original_placeholder: str, processed_placeholder: str, print_full_path: bool = False, overwrite: bool = False):
     if not original_path.exists():
         print(original_path, "does not exist")
     elif original_placeholder not in command_template:
@@ -132,7 +141,10 @@ def process(command_template: str, original_path: Path, processed_path: Path, or
     elif processed_placeholder not in command_template:
         print(f"template {repr(command_template)} is missing output placeholder {repr(processed_placeholder)}")
     elif original_path.is_file():
-        run_command(command_template, original_path, processed_path, original_placeholder, processed_placeholder)
+        if processed_path.exists() and not overwrite:
+            print("Not allowed to overwrite processed image, pass --overwrite")
+        else:
+            run_command(command_template, original_path, processed_path, original_placeholder, processed_placeholder)
     elif original_path.is_dir():
         create_texture_processed_pack(command_template, original_path, processed_path, original_placeholder, processed_placeholder, print_full_path)
     else:
@@ -154,7 +166,8 @@ def main():
         help="The names of the filters to apply")
     create_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
-    # -r --max-depth x
+    create_parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+        help="Overwrite the patch image if it exists")
 
     apply_parser = subparsers.add_parser("apply", help="Apply a patch")
     apply_parser.add_argument(dest="original_path",                    metavar="original-path", type=Path, # "-i", "--input", default=".",
@@ -169,6 +182,8 @@ def main():
         help="The names of the filters to invert")
     apply_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
+    apply_parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+        help="Overwrite the patched image if it exists")
     # -r --max-depth x
 
     diff_parser = subparsers.add_parser("diff", help="Compare a reference image with a modified one")
@@ -180,6 +195,8 @@ def main():
         help="The path to the directory containing difference images or difference image")
     diff_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
+    diff_parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+        help="Overwrite the reversed image if it exists")
 
     reverse_parser = subparsers.add_parser("reverse", help="Reverse the original image by a patch")
     reverse_parser.add_argument(dest="modified_path",                  metavar="modified-path",   type=Path, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
@@ -188,6 +205,8 @@ def main():
         help="The path to the patch directory or image")
     reverse_parser.add_argument(dest="reversed_path",                  metavar="reversed-path",   type=Path, # "-i", "--input", default=".",
         help="The path to the directory containing reversed images or reversed image")
+    reverse_parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+        help="Overwrite the processed image if it exists")
 
     test_parser = subparsers.add_parser("test", help="Run all modes on an original and its modified image")
     test_parser.add_argument(dest="original_path",                     metavar="original-path",   type=Path, # "-i", "--input", default=".",
@@ -222,18 +241,20 @@ def main():
         help="Use a different place holder in the command template for the processed image's output path")
     process_parser.add_argument("--print-full-path", dest="print_full_path", action="store_true",
         help="Print full paths when processing an image in a directory")
+    process_parser.add_argument("--overwrite", dest="overwrite", action="store_true",
+        help="Overwrite the processed image if it exists")
     
 
     arguments = parser.parse_args()
     command = arguments.subparser_name
     match command:
-        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names, arguments.print_full_path)
-        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.validate_path, arguments.filter_names, arguments.print_full_path)
-        case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path, arguments.print_full_path)
+        case "create":      create(arguments.original_path, arguments.modified_path, arguments.patch_path, arguments.filter_names, arguments.print_full_path, arguments.overwrite)
+        case "apply":       apply(arguments.original_path, arguments.patch_path, arguments.patched_path, arguments.validate_path, arguments.filter_names, arguments.print_full_path, arguments.overwrite)
+        case "diff":        diff(arguments.reference_path, arguments.modified_path, arguments.difference_path, arguments.print_full_path, arguments.overwrite)
         case "reverse":     reverse(arguments.modified_path, arguments.patch_path, arguments.reversed_path)
         case "test":        test(arguments.original_path, arguments.modified_path)
         case "test-filter": test_filter(arguments.image_path, arguments.filtered_path, arguments.filter_names, arguments.seed_image_path, arguments.inverted)
-        case "process":     process(arguments.command_template, arguments.image_path, arguments.processed_path, arguments.original_placeholder, arguments.processed_placeholder, arguments.print_full_path)
+        case "process":     process(arguments.command_template, arguments.image_path, arguments.processed_path, arguments.original_placeholder, arguments.processed_placeholder, arguments.print_full_path, arguments.overwrite)
         case _:             parser.print_help()
 
 

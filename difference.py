@@ -57,7 +57,7 @@ def compare_image(reference_path: Path, patched_path: Path, difference_path: Pat
     return int(difference.min()), int(difference.max())
 
 
-def compare_pack(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False) -> None:
+def compare_pack(reference_path: Path, patched_path: Path, difference_path: Path|None, print_full_path: bool = False, overwrite: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -74,12 +74,16 @@ def compare_pack(reference_path: Path, patched_path: Path, difference_path: Path
             try:
                 if not image_patched_path.exists():
                     raise FileNotFoundError("Patched file does not exist")
-                difference = compare_image(image_reference_path, image_patched_path)
+                elif not overwrite and image_processed_path.exists():
+                    raise FileExistsError("Not allowed to overwrite")
+                difference = compare_image(image_reference_path, image_patched_path, difference_path)
                 text2 = (f"{GREEN}✔{RESET}" if difference == (0, 0) else f"{RED}✖{RESET}") + " " + text + "\t" + f"({BLUE}{difference[0]}{RESET}, {RED}{difference[1]}{RESET})"
                 print_indented(text2, level, end="\n", flush=True) # https://symbolsdb.com/check-mark-symbol
             except FileNotFoundError as e:
                 print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
                 print("warning:", str(e))
+            except FileExistsError as e:
+                print_indented(f"{GREEN}✖{RESET} {text} SKIPPED: {e}", level, end="\n", flush=True)
             except Exception as e:
                 error_paths.append(image_reference_path)
                 print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)

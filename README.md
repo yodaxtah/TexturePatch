@@ -300,7 +300,7 @@ The tool has a minimal CLI that allows recursively creating patches for all PNGs
 - [x] Support `--filters` in `create`, `apply`
 - [x] Check if paths exist instead of crashing
 - [x] Prevent duplicate path arguments where it's probably unintended
-- [ ] Add an option to `--overwrite` and do not overwrite by default
+- [x] Add an option to `--overwrite` and do not overwrite by default
 - [ ] Read options from a json settings file in the current directory if exists.
 - [x] Allow for the definition of a generic `process` command, so people can decide themselves what to do additionally (e.g., run a certain compression tool).
 - [ ] Also provide example `process` commands for on the compression tools.

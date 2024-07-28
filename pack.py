@@ -8,7 +8,7 @@ from traverse import check_out_path, print_indented
 SUFFIXES = [".png"]
 
 
-def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False) -> None:
+def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_path: Path, filter_names: list[str] = [], print_full_path: bool = False, overwrite: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -26,7 +26,11 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
             try:
                 if not image_original_path.exists():
                     raise FileNotFoundError("Original file does not exist")
+                elif not overwrite and image_patch_path.exists():
+                    raise FileExistsError("Not allowed to overwrite")
                 create_patch(image_original_path, image_modified_path, image_patch_path, filter_names)
+            except FileExistsError as e:
+                print_indented(f"{GREEN}✖{RESET} {text} SKIPPED: not allowed to overwrite", level, end="\n", flush=True)
             except FileNotFoundError as e:
                 print_indented(f"{ORANGE}✖{RESET} {text}", level, end="\t", flush=True)
                 print("warning:", str(e))
@@ -43,7 +47,7 @@ def create_texture_patch_pack(original_path: Path, modified_path: Path, patch_pa
             print("  " + str(path))
 
 
-def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = [], print_full_path: bool = False) -> None:
+def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, modified_path: Path|None = None, filter_names: list[str] = [], print_full_path: bool = False, overwrite: bool = False) -> None:
     error_paths = []
     def callback_dir(path: Path, level: int):
         text = path.name
@@ -58,6 +62,8 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
         print_indented("… " + text, level, end="\r")
         image_pack_path.parent.mkdir(parents=True, exist_ok=True)
         try:
+            if not overwrite and image_pack_path.exists():
+                raise FileExistsError("Not allowed to overwrite")
             create_patched(image_original_path, image_patch_path, image_pack_path, filter_names)
             if modified_path:
                 image_modified_path = modified_path.joinpath(relative_replacements_path)
@@ -68,6 +74,8 @@ def create_texture_pack(original_path: Path, patch_path: Path, pack_path: Path, 
                     print(f"({BLUE}{difference[0]}{RESET}, {RED}{difference[1]}{RESET})")
             else:
                 print_indented(f"{GREEN}✔{RESET}", level, flush=True) # https://symbolsdb.com/check-mark-symbol
+        except FileExistsError as e:
+            print_indented(f"{GREEN}✖{RESET} {text} SKIPPED: {e}", level, end="\n", flush=True)
         except AssertionError as e:
             print_indented(f"{RED}✖{RESET} {text}", level, end="\t", flush=True)
             print("assertion error:", str(e))
