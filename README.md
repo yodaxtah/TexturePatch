@@ -298,34 +298,40 @@ In its current state, three packs have been created and applied successfully to 
 - JAK2_hd_hud
 - Jak2-HD-Textures-For-OpenGOAL-main
 
-So far, the created patches don't seem to have issues when crossing platforms. For the last pack, one patch was created using Windows and was succesfully applied using Linux; another patch was created using Linux and succesfully applied using Windows. (There is an exception that caught on patching on Linux that may have slipped on Windows as well on images in Jak and Daxter's `gamefont` folder.
+So far, the created patches don't seem to have issues when crossing platforms. For the last (large) pack, one patch was created using Windows and was succesfully applied using Linux; another patch was created using Linux and succesfully applied using Windows. There is still an error on large white images that cause a buffer overflow on older versions of numpy, which still has to be addressed.
 
-The tool has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches. Given that the concept has been implemented to most extent and is practically useful, there isn 't much left planned. Here are a few things.
+The tool has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches. Given that the concept has been implemented to most extent and is practically useful, there isn 't much left planned. Here are a few things for the near future.
 
 - [x] Fix an outdated assertion that fails when the header row is bigger than the image size.
+- [ ] Fix buffer overflow bug on bright images.
 - [x] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
-- [ ] Try out more packs created for other games than those in the Jak and Daxter series or supported by the [OpenGOAL project](https://opengoal.dev/).
-- [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
 - [x] Support directories for `diff`
 - [x] ~~Support directories for `reverse`, `test`, `test-filter`~~
 - [x] Support `--filters` in `create`, `apply`
 - [x] Check if paths exist instead of crashing
 - [x] Prevent duplicate path arguments where it's probably unintended
 - [x] Add an option to `--overwrite` and do not overwrite by default
-- [ ] Read options from a json settings file in the current directory if exists.
 - [x] Allow for the definition of a generic `process` command, so people can decide themselves what to do additionally (e.g., run a certain compression tool).
 - [x] Also provide an example `process` command for one of the compression tools.
 - [ ] Explanation, summary (#files, list of directories) and confirm continue, `-y`/`--yes`.
+- [ ] Setup process to automatically produce an exe that can run on Windows, Linux, Mac.
+
+Other things I'd like to include, but won't actively plan on and may not do.
+
+- [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
+- [ ] Read default options from a json settings file in the current directory if exists, or pass `--options/default path` that can be overriden by cli arguments.
+- [ ] Investigate global keys to plug into image seed extraction, by default 0
 - [ ] Investigate patch to patch.
     - Update only updated textures or patch.
     - Should also require noise depending on what is the update.
     - Doesn't make sense if you'd have to chain multiple `apply`s, instead of doing it once.
 - [ ] Investigate some automatic level of noise detection is required per image to reduce unnecessary noise size for patches with less edges.
-- [ ] Setup process to automatically produce an exe that can run on Windows, Linux, Mac.
+- [ ] Investigate global keys; which can be suggested upon creation with some random number generator.
+- [ ] Try out more packs created for other games than those in the Jak and Daxter series or supported by the [OpenGOAL project](https://opengoal.dev/).
 
 ## Q & A
 
-1. _Can't someone publish these keys and a modification of a reversing algorithm to extract the original images that requires just the patch and the modified textures?_ Sure, but in any case, they can just as well upload the original or modified textures, which is much less of a hassle.
+1. _Can't someone publish these keys and a modification of a reversing algorithm to extract the original images that requires just the patch and the modified textures?_ Sure, but in any case, they can just as well upload the original or modified textures, which is much less of a hassle. What can be done to further protect the images is have someone define a few numbers globally that can be plugged in the key extraction process; this way, authors can still remove their patch (pack) when they are aware of keys being shared, recreate and reupload a pack with different global keys. _In any case, just like people uploading original/modified textures, it is the intent of bad actors to do so, and they cannot be stopped._
 1. _Are 16-bit png images supported?_ Yes, but no. The patching works, but it is not yet meant to be used. The original image has to be scaled (**which is currently not the case!**), otherwise, there will be very little difference visible (0-255) compared to (0-65535), and the patch can be just downsampled, creating a very good attempt at reversing the original.
 1. _Are jpgs images supported?_ JPGs are a lossy format (that I personally wouldn't expect for games), thus to create a patch for them that results in the exact same jpg is unlikely. The tool creates a png patch, but upon storing the eventual patched image as jpg, some of the data gets lost. This would/should be the case as well when reading and directly writing the image -- yet to be tried. These differences are hardly visible to the eye.
 1. _What are these iccp warnings?_ I'm not sure exactly ([some corruption of the modified image](https://stackoverflow.com/questions/22745076/libpng-warning-iccp-known-incorrect-srgb-profile)), but the goal is to exactly recreate the image. If the modified image is corrupted before patched, then the eventual patched image will have it too.
