@@ -228,6 +228,17 @@ Several compression tools exist for lossless (or lossy) compression, some even h
 - [fpng](https://github.com/richgel999/fpng)
 - [pngquant](https://github.com/kornelski/pngquant)
 
+We provide an example for `pngcrush`, but generally, to know where to put the placeholders, just execute your-compressor, and the first line will usually tell you where "input" or "input image" is expected and "output". For `pngcrush`, the basic command looks like `pngcrush original.png processed.png`. We can execute this using our tool, or we can investigate the `--help` command / look online for the best results according to your needs, which may be prioritizing the smallest size.
+
+```console
+# default options for pngcrush
+python main.py process "pngcrush [:original:] [:processed:]" ./demo/logo.png ./demo/logo.png-compressed-default
+# options for pngcrush to run all 114 algorithms and pick best result (much slower!!)
+python main.py process "pngcrush  -rem allb -brute -reduce [:original:] [:processed:]" ./demo/logo.png ./demo/logo.png-compressed-brute`
+```
+
+With the default options, our logo was compressed in 17s to size 1.13MB. With the brute force method, it took 2m54s to only reduce it 1KB more (which is not worth the time and CPU wear). This doesn't mean of course that therefore other tools are only competing over a few bytes. [Zopfli should have an additional reduction of 6% to gzip](https://www.telerik.com/blogs/maximize-compression-with-zopfli) while pngcrush uses gzip, although no exe was readily available to test it out.
+
 For those wondering, as of now, you can't run the tool's `create` or `apply` using `process`, as it works on a predefined number (2) on paths, and those commands require three paths.
 
 ## Demo
@@ -303,7 +314,7 @@ The tool has a minimal CLI that allows recursively creating patches for all PNGs
 - [x] Add an option to `--overwrite` and do not overwrite by default
 - [ ] Read options from a json settings file in the current directory if exists.
 - [x] Allow for the definition of a generic `process` command, so people can decide themselves what to do additionally (e.g., run a certain compression tool).
-- [ ] Also provide example `process` commands for on the compression tools.
+- [x] Also provide an example `process` command for one of the compression tools.
 - [ ] Explanation, summary (#files, list of directories) and confirm continue, `-y`/`--yes`.
 - [ ] Investigate patch to patch.
     - Update only updated textures or patch.
