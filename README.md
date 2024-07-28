@@ -1,11 +1,20 @@
+<!-- ![texture-patch-logo](./canva/logo-4-6-alpha-resized.png) -->
+<center>
+<img alt="texture-patch-logo" src="./canva/logo-4-6-alpha-resized.png" width="300" />
+</center>
+
+<!-- --- -->
 # TexturePatch
 
 Many game console emulators allow users to extract and replace textures, while decompiled games also provide opportunities to upscale and clean up their visuals. However, the legal landscape surrounding these texture modifications is complex. Players are generally free to tinker with textures they've extracted from games they own. But sharing those enhanced assets publicly would likely infringe on the original copyright holders' intellectual property rights.
 
-This is where the TexturePatch tool comes into play. It is a proof-of-concept tool that enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
+This is where the TexturePatch tool comes into play. It enables artists/enhancers/modders to create publicly shareable "texture patches." These patches can then be applied by players to their own extracted game textures, allowing them to enjoy improved visuals without the risk of copyright infringement.
 
 > [!WARNING]
-> While TexturePatch has progressed beyond a proof-of-conept tool in its technical area, it still requires critical review by other people on its methods. Currently, we _cannot_ guarantee patches are a safe format to be uploaded and whether it would be legal. We can only say that it is _very likely_ safe and _probably_ legal, especially if this method is compared to simply uploading modified versions of original textures as they are.
+> While TexturePatch has progressed beyond a proof-of-conept tool in its technical area, it still requires critical review by other people on its methods. Currently, we can _not_ guarantee patches are a safe format to be uploaded and whether it would be legal. We can only say that it is _very likely_ safe and _probably_ legal, unlike simply uploading modified versions of original textures as they are.
+
+> [!NOTE]
+For testing, be it successful or not; feel free to open an issue and let me know!
 
 ## Concept
 
