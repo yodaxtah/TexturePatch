@@ -42,7 +42,8 @@ def sign_unshifted_image(is_positive: np.ndarray, image: np.ndarray) -> np.ndarr
 
 
 def signed(is_positive: np.ndarray, matrix: np.ndarray, positive_offset: int = 0, negative_offset: int = 0, positive_factor: int = 1, negative_factor: int = -1) -> np.ndarray:
-    assert is_positive.shape == matrix.shape, "map shape doesn't match mtrix shape"
+    assert is_positive.shape == matrix.shape, "map shape doesn't match matrix shape"
+    assert matrix.dtype.kind != "u"
     positive = (matrix + positive_offset) * positive_factor * is_positive
     negative = (matrix + negative_offset) * negative_factor * np.invert(is_positive)
     return positive + negative
