@@ -293,16 +293,24 @@ The tool has a minimal CLI that allows recursively creating patches for all PNGs
 
 - [x] Fix an outdated assertion that fails when the header row is bigger than the image size.
 - [x] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
-- [ ] Try out more packs (and fix new bugs maybe)
+- [ ] Try out more packs created for other games than those in the Jak and Daxter series or supported by the [OpenGOAL project](https://opengoal.dev/).
 - [ ] Have the concept/tool get assessed/reviewed by others with any level of expertise (legal, image processing, image compression, decompiling, ...)
 - [x] Support directories for `diff`
-- [ ] ~~Support directories for `test`, `test-filter`~~
-- [x] Support filters in `create`, `apply`
+- [x] ~~Support directories for `reverse`, `test`, `test-filter`~~
+- [x] Support `--filters` in `create`, `apply`
 - [x] Check if paths exist instead of crashing
 - [x] Prevent duplicate path arguments where it's probably unintended
 - [ ] Add an option to `--overwrite` and do not overwrite by default
 - [ ] Read options from a json settings file in the current directory if exists.
 - [x] Allow for the definition of a generic `process` command, so people can decide themselves what to do additionally (e.g., run a certain compression tool).
+- [ ] Also provide example `process` commands for on the compression tools.
+- [ ] Explanation, summary (#files, list of directories) and confirm continue, `-y`/`--yes`.
+- [ ] Investigate patch to patch.
+    - Update only updated textures or patch.
+    - Should also require noise depending on what is the update.
+    - Doesn't make sense if you'd have to chain multiple `apply`s, instead of doing it once.
+- [ ] Investigate some automatic level of noise detection is required per image to reduce unnecessary noise size for patches with less edges.
+- [ ] Setup process to automatically produce an exe that can run on Windows, Linux, Mac.
 
 ## Q & A
 
