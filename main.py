@@ -152,7 +152,7 @@ def process(command_template: str, original_path: Path, processed_path: Path, or
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="TexturePatch", description="Tool to create patches from the original image to the modified image")
+    parser = argparse.ArgumentParser(prog="TexturePatch", description="Tool to create patches from the original image to the modified image, apply them and a few test utilities")
     subparsers = parser.add_subparsers(dest="subparser_name", help="sub-command help")
     
     create_parser = subparsers.add_parser("create", help="Create a patch")
@@ -214,7 +214,7 @@ def main():
     test_parser.add_argument(dest="modified_path",                     metavar="modified-path",   type=Path, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
         help="The path to the modified directory or image")
 
-    filter_parser = subparsers.add_parser("test-filter", help=" all modes on an original and its modified image")
+    filter_parser = subparsers.add_parser("test-filter", help="Test filters on a patch or regular image")
     filter_parser.add_argument(dest="image_path",                      metavar="image-path",      type=Path, # "-i", "--input", default=".",
         help="The path to the directory of images or image")
     filter_parser.add_argument(dest="filtered_path",                   metavar="filtered-path",   type=Path, # "-m", "--modified", default=DEFAULT_OUTPUT_PATH,
