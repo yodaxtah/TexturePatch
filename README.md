@@ -1,7 +1,7 @@
 <!-- ![texture-patch-logo](./canva/logo-4-6-alpha-resized.png) -->
-<center>
-<img alt="texture-patch-logo" src="./canva/logo-4-6-alpha-resized.png" width="300" />
-</center>
+<div align="center">
+    <img alt="texture-patch-logo" src="./canva/logo-4-6-alpha-resized.png" width="300" />
+</div>
 
 <!-- --- -->
 # TexturePatch
