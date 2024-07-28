@@ -270,11 +270,9 @@ Now, applying filters to this patch separately. Once can exactly reverse this im
 | <img alt="patched logo for 4x upscale" src="./demo/logo-patch-4.png" width="120px" /> | <img alt="alpha shifted logo for 4x upscale" src="./demo/logo-patch-4-shifted.png" width="120px" /> | <img alt="filtered logo for 4x upscale" src="./demo/logo-filtered-4.png" width="120px" /> | <img alt="inverted logo for 4x upscale" src="./demo/logo-inverted-4.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-4-logo-patch-4-logo-inverted-4.png" width="120px" /> |
 | <img alt="patched logo for 2x upscale" src="./demo/logo-patch-2.png" width="120px" /> | <img alt="alpha shifted logo for 2x upscale" src="./demo/logo-patch-2-shifted.png" width="120px" /> | <img alt="filtered logo for 2x upscale" src="./demo/logo-filtered-2.png" width="120px" /> | <img alt="inverted logo for 2x upscale" src="./demo/logo-inverted-2.png" width="120px" /> | <img alt="difference logo between for patched logo and inverted logo" src="./demo/logo-difference-2-logo-patch-2-logo-inverted-2.png" width="120px" /> |
 
-
 We did not bother to additionally write an algorithm with $Noise(0)$ to view what it would look like without the correct seed. For some filters, it would simply do nothing! Or, just use any other `--seed` that previously used, it will also look off.
 
 <!-- TODO: Example image here. -->
-
 
 ## Roadmap
 
