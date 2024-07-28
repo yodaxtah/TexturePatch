@@ -183,10 +183,13 @@ python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.p
 
 ### `process`
 
-Finally, one can execute an arbitrary command on the images, as an optional post-processing step. This may be useful to automatically upscaler/enhance each image in a certain directory given input (`[:original:]`) and output (`[:processed:]`) placeholders. The command below will pass the images in `./textures` one by one as `[:original:]` to `cp` and its resulting images will be stored at `./textures-copy` one by one as `[:processed:]`.
+Finally, one can execute an arbitrary command line program on the images, as an optional pre/post-processing step. This may be useful to automatically upscaler/enhance/compress/... each image in a certain directory given input (`[:original:]`) and output (`[:processed:]`) placeholders. As an example, the command below will pass the images in `./textures` one by one as `[:original:]` to `cp` and its resulting images will be stored at `./textures-copy` one by one as `[:processed:]`.
 
 ```console
 python main.py process "cp [:original:] [:processed:]" ./textures ./textures-copied # on a directory
+# if ./textures contains only two images (foo.png and bar.png), the following is the same
+cp ./textures/foo.png ./textures-copied/foo.png
+cp ./textures/bar.png ./textures-copied/bar.png
 ```
 
 One individual texture can be processed either, but it has no point really, as it can be written directly in the terminal without placeholders.
@@ -196,7 +199,7 @@ python main.py process "cp [:original:] [:processed:]" ./textures/foo.png ./text
 cp ./textures/foo.png ./textures/foo-copy.png # the same
 ```
 
-The default placeholders can be overriden, if that is necessary, using `--placeholder-input`, and `--placholder-output`. Make sure the custom placeholders won't occur elsewhere in the template, because _all_ occurrences will be filled in!
+The default placeholders can be overriden, if that is necessary, using `--placeholder-input`, and `--placholder-output`. Make sure the custom placeholders do not occur elsewhere in the template, because _all_ occurrences will be filled in!
 
 ```console
 # example placeholders
