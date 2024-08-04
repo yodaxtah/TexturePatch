@@ -1,6 +1,6 @@
 <!-- ![texture-patch-logo](./canva/logo-4-6-alpha-resized.png) -->
 <div align="center">
-    <img alt="texture-patch-logo" src="./canva/logo-4-6-alpha-resized.png" width="300" />
+    <img alt="texture-patch-logo" src="./canva/logo-4-6-alpha-bordered-resized.png" width="300" />
 </div>
 
 <!-- --- -->
