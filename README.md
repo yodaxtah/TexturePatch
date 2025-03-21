@@ -138,6 +138,12 @@ Adding a third path will always generate a difference image, in which completely
 python main.py diff ./demo/crate-brown-wood-modified.png ./demo/crate-brown-wood-patched.png ./demo/crate-brown-wood-difference-modified-patched.png
 ```
 
+For other image comparison tools, see also:
+- [Odiff](https://github.com/dmtrKovalenko/odiff) (cli)
+- [Pixelmatch](https://github.com/mapbox/pixelmatch) (cli)
+- [Simple Image Compare](https://github.com/Sirosky/Simple-Image-Compare) (gui)
+- [Identity](https://gitlab.gnome.org/YaLTeR/identity) (gui)
+
 ### `reverse`
 
 Finally, to see if the noise is large enough, the following command will create a reversed image [crate-brown-wood-reversed.png](./demo/crate-brown-wood-patch.png) with using 0 for each noise value -- since the original is presumed not to be accessible and thus unknown.
