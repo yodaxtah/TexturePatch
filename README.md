@@ -211,7 +211,7 @@ python main.py process "cp o p" ./textures/foo.png ./textures/foo-copy.png --inp
 c./textures/foo-copy.png ./textures/foo.png ./textures/foo-copy.png # the same
 ```
 
-Also see the guides on [compressing images](./guides/process-pngcrush.md) using the `process` command.
+Also see the guides on [upcaling textures](./guides/process-upscayl-bin.md) and [compressing images](./guides/process-pngcrush.md) using the `process` command.
 
 For those wondering, as of now, you can't run the tool's `create` or `apply` using `process`, as it works on a predefined number (2) on paths, and those commands require three paths.
 
