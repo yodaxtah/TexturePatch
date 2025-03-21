@@ -33,8 +33,8 @@ You might consider downloading or copying the content from system installations 
 # Get the ncnn binary
 wget "https://github.com/upscayl/upscayl-ncnn/releases/download/20240601-103425/upscayl-bin-20240601-103425-linux.zip"
 
-# Extract the zip content (which can also happen in gui if 7z not installed)
-7z upscayl-bin-20240601-103425-linux.zip
+# Extract the zip content (which can also happen in gui or with "7z X" if not installed)
+unzip upscayl-bin-20240601-103425-linux.zip
 
 # alias the downloaded/copied upscaler to user space
 set upsc "$$project/upscayl-bin"
