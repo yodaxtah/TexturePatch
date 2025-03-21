@@ -15,7 +15,7 @@ def run_command(command_template: str, image_original_path: Path, image_processe
     command = command_template
     command = command.replace(original_placeholder, "'" + image_original_path.as_posix() + "'")
     command = command.replace(processed_placeholder, "'" + image_processed_path.as_posix() + "'")
-    finished = subprocess.run(command)
+    finished = subprocess.run(command, shell=True, capture_output=True)
     try:
         finished.check_returncode()
     except Exception as e:
