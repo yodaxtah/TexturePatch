@@ -9,7 +9,7 @@ DEFAULT_ORIGINAL_PLACEHOLDER  = "[:original:]"
 DEFAULT_PROCESSED_PLACEHOLDER = "[:processed:]"
 
 
-def run_command(command_template: str, image_original_path: Path, image_processed_path: Path, original_placeholder: str = DEFAULT_ORIGINAL_PLACEHOLDER, processed_placeholder: str = DEFAULT_PROCESSED_PLACEHOLDER) -> None:
+def run_command(command_template: str, image_original_path: Path, image_processed_path: Path, original_placeholder: str = DEFAULT_ORIGINAL_PLACEHOLDER, processed_placeholder: str = DEFAULT_PROCESSED_PLACEHOLDER, print_output: bool = False) -> None:
     assert original_placeholder in command_template
     assert processed_placeholder in command_template
     command = command_template
@@ -17,6 +17,8 @@ def run_command(command_template: str, image_original_path: Path, image_processe
     command = command.replace(processed_placeholder, "'" + image_processed_path.as_posix() + "'")
     finished = subprocess.run(command, shell=True, capture_output=True)
     try:
+        if print_output:
+            print(finished.stdout)
         finished.check_returncode()
     except Exception as e:
         print()
