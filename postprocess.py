@@ -4,7 +4,7 @@ from cli import RESET, RED, GREEN, ORANGE, BLUE, MAGENTA, CYAN, BOLD
 from traverse import check_out_path, print_indented
 
 
-SUFFIXES = [".png"]
+SUFFIXES = [".png", ".jpg"]
 DEFAULT_ORIGINAL_PLACEHOLDER  = "[:original:]"
 DEFAULT_PROCESSED_PLACEHOLDER = "[:processed:]"
 
