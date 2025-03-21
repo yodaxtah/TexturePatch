@@ -22,7 +22,7 @@ This is the exact same executable you'll also find in the released binaries of [
 The following is fish code. The only difference with bash would be using the `=` syntax instead of the `set` command. We're going to create a temporary folder to put all our temporary content in.
 
 ```bash
-set project "$$project/"
+set project ~/Projects/Skyboxes
 mkdir $project -p
 cd $project
 ```
