@@ -94,3 +94,75 @@ If the previous worked out and you are sure about the selected parameters you're
 # process each image in $original and place it in $upscaled with the same relative file structure
 python main.py process "$upsc -i [:original:] -o [:processed:] -f jpg -z 4 -c 0 -t 32 -n upscayl-standard-4x" $original $upscaled
 ```
+
+Note that the order appears not always to be alphabetic. (For example, desert_lf.jpg appears much later than the rest of desert's skybox images.) The output should be the following:
+
+```txt
+original (66)
+  ✔ barren_bk.jpg
+  ✔ barren_dn.jpg
+  ✔ barren_ft.jpg
+  ✔ barren_lf.jpg
+  ✔ barren_rt.jpg
+  ✔ barren_up.jpg
+  ✔ desert_bk.jpg
+  ✔ desert_dn.jpg
+  ✔ desert_ft.jpg
+  ✔ desert_rt.jpg
+  ✔ desert_up.jpg
+  ✔ devpun_bk.jpg
+  ✔ devpun_dn.jpg
+  ✔ devpun_ft.jpg
+  ✔ devpun_lf.jpg
+  ✔ devpun_rt.jpg
+  ✔ devpun_up.jpg
+  ✔ emerald_bk.jpg
+  ✔ emerald_dn.jpg
+  ✔ emerald_ft.jpg
+  ✔ emerald_lf.jpg
+  ✔ emerald_rt.jpg
+  ✔ emerald_up.jpg
+  ✔ frozendusk_bk.jpg
+  ✔ frozendusk_dn.jpg
+  ✔ frozendusk_ft.jpg
+  ✔ frozendusk_lf.jpg
+  ✔ frozendusk_rt.jpg
+  ✔ frozendusk_up.jpg
+  ✔ frozen_bk.jpg
+  ✔ frozen_dn.jpg
+  ✔ frozen_ft.jpg
+  ✔ frozen_lf.jpg
+  ✔ frozen_rt.jpg
+  ✔ frozen_up.jpg
+  ✔ grave_bk.jpg
+  ✔ grave_ft.jpg
+  ✔ grave_lf.jpg
+  ✔ grave_rt.jpg
+  ✔ grave_up.jpg
+  ✔ mars_bk.jpg
+  ✔ mars_dn.jpg
+  ✔ mars_ft.jpg
+  ✔ mars_lf.jpg
+  ✔ mars_rt.jpg
+  ✔ mars_up.jpg
+  ✔ nightball_bk.jpg
+  ✔ nightball_dn.jpg
+  ✔ nightball_ft.jpg
+  ✔ nightball_lf.jpg
+  ✔ nightball_rt.jpg
+  ✔ desert_lf.jpg
+  ✔ grave_dn.jpg
+  ✔ nightball_up.jpg
+  ✔ stratosphere_bk.jpg
+  ✔ stratosphere_dn.jpg
+  ✔ stratosphere_ft.jpg
+  ✔ stratosphere_lf.jpg
+  ✔ stratosphere_rt.jpg
+  ✔ stratosphere_up.jpg
+  ✔ valley_bk.jpg
+  ✔ valley_dn.jpg
+  ✔ valley_ft.jpg
+  ✔ valley_lf.jpg
+  ✔ valley_rt.jpg
+  ✔ valley_up.jpg
+```
