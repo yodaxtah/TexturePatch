@@ -82,7 +82,7 @@ Again, simplifications are made. Now, the range is no longer 9 bit (to maximally
 
 ## Protecting visible shapes in patches
 
-Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e., "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is the somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
+Conceptually speaking, the difference between two similar images should be small, and thus the overall size of the image should also be smaller. However, when an image consists of random pixel values (i.e., "noise"), each of these pixels must be described individually, and thus the max potential compression ratio is smaller (concepts of image compression). Since this is somewhat the case for a protected patch, its file size should be larger (even if the rows would be discarded).
 <!-- These small differences tend to give away the edges present in a texture -- the overal shape. This is currently a consideration to make when using the tool. On the other hand, the colors can't be reversed, nor the size of the orignal image. Someone that does not have access to the original textures is time-wise better of obtaining them somewhere online illegally, than doing manual cleaning of the edges. (Attempts are welcome to see the effectiveness!) -->
 
 
@@ -183,7 +183,7 @@ python main.py test-filter ./demo/logo-filtered.png ./demo/logo-patch-inverted.p
 
 ### `process`
 
-Finally, one can execute an arbitrary command line program on the images, as an optional pre/post-processing step. This may be useful to automatically upscaler/enhance/compress/... each image in a certain directory given input (`[:original:]`) and output (`[:processed:]`) placeholders. As an example, the command below will pass the images in `./textures` one by one as `[:original:]` to `cp` and its resulting images will be stored at `./textures-copy` one by one as `[:processed:]`.
+Finally, one can execute an arbitrary command line program on the images, as an optional pre/post-processing step. This may be useful to automatically upscale/enhance/compress/... each image in a certain directory given input (`[:original:]`) and output (`[:processed:]`) placeholders. As an example, the command below will pass the images in `./textures` one by one as `[:original:]` to `cp` and its resulting images will be stored at `./textures-copy` one by one as `[:processed:]`.
 
 ```console
 python main.py process "cp [:original:] [:processed:]" ./textures ./textures-copied # on a directory
@@ -240,7 +240,7 @@ python main.py process "pngcrush [:original:] [:processed:]" ./demo/logo.png ./d
 python main.py process "pngcrush  -rem allb -brute -reduce [:original:] [:processed:]" ./demo/logo.png ./demo/logo.png-compressed-brute`
 ```
 
-With the default options, our logo was compressed in 17s to size 1.13MB. With the brute force method, it took 2m54s to only reduce it 1KB more (which is not worth the time and CPU wear). This doesn't mean of course that therefore other tools are only competing over a few bytes. [Zopfli should have an additional reduction of 6% to gzip](https://www.telerik.com/blogs/maximize-compression-with-zopfli) while pngcrush uses gzip, although no exe was readily available to test it out.
+With the [default options](./demo/logo-compressed-default.png), our logo was compressed in 17s to size 1.13MB. With the [brute force method](./demo/logo-compressed-brute.png), it took 2m54s to only reduce it 1KB more (which is not worth the time and CPU wear). This doesn't mean of course that therefore other tools are only competing over a few bytes. [Zopfli should have an additional reduction of 6% to gzip](https://www.telerik.com/blogs/maximize-compression-with-zopfli) while pngcrush uses gzip, although no exe was readily available to test it out.
 
 For those wondering, as of now, you can't run the tool's `create` or `apply` using `process`, as it works on a predefined number (2) on paths, and those commands require three paths.
 
@@ -301,12 +301,12 @@ In its current state, three packs have been created and applied successfully to 
 - JAK2_hd_hud
 - Jak2-HD-Textures-For-OpenGOAL-main
 
-So far, the created patches don't seem to have issues when crossing platforms. For the last (large) pack, one patch was created using Windows and was succesfully applied using Linux; another patch was created using Linux and succesfully applied using Windows. There is still an error on large white images that cause a buffer overflow on older versions of numpy, which still has to be addressed.
+So far, the created patches don't seem to have issues when crossing platforms. For the last (large) pack, one patch was created using Windows and was succesfully applied using Linux; another patch was created using Linux and succesfully applied using Windows.
 
 The tool has a minimal CLI that allows recursively creating patches for all PNGs and recursively applying patches. Given that the concept has been implemented to most extent and is practically useful, there isn 't much left planned. Here are a few things for the near future.
 
 - [x] Fix an outdated assertion that fails when the header row is bigger than the image size.
-- [ ] Fix buffer overflow bug on bright images.
+- [x] Fix buffer overflow bug on bright images.
 - [x] Test whether issues arise when applying patches created on one platform (Windows) on images on another platform (Linux)
 - [x] Support directories for `diff`
 - [x] ~~Support directories for `reverse`, `test`, `test-filter`~~
